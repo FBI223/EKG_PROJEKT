@@ -1,0 +1,17 @@
+# tensorflow
+# numpy
+# wfdb
+# scikit-learn
+# matplotlib
+# scipy
+# tensorflow.keras
+# cudatoolkit
+
+
+# run following command to install packages
+# pip install tensorflow numpy wfdb scikit-learn matplotlib scipy tensorflow.keras cudatoolkit
+
+
+#conda install -y tensorflow numpy scipy matplotlib scikit-learn
+#conda install -y -c conda-forge wfdb
+#conda install -y -c conda-forge cudatoolkit=11.8
