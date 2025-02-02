@@ -12,8 +12,6 @@ def main():
     """Główny skrypt uruchamiający przetwarzanie EKG i trening modelu CNN."""
 
 
-    print("Wykryte GPU:", tf.config.list_physical_devices('GPU'))
-    return
 
 
     # **1️⃣ Wczytanie danych**
