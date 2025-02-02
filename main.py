@@ -5,11 +5,27 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import load_model
 from data.dataset_loader import prepare_qrs_dataset
 from models.cnn_model import build_cnn
-
+import tensorflow as tf
 
 def main():
     """Główny skrypt uruchamiający przetwarzanie EKG i trening modelu CNN."""
 
+
+
+    
+
+    # Sprawdzenie dostępnych urządzeń GPU
+    gpus = tf.config.list_physical_devices('GPU')
+
+    if gpus:
+        print(f"✅ Wykryto {len(gpus)} GPU:")
+        for i, gpu in enumerate(gpus):
+            details = tf.config.experimental.get_device_details(gpu)
+            gpu_name = details.get('device_name', 'Nieznana nazwa GPU')
+            print(f"  🖥️ GPU {i}: {gpu_name}")
+        else:
+            print("❌ Brak wykrytych GPU w TensorFlow.")
+    
     # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
     X, y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=300)
