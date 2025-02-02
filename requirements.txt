@@ -29,11 +29,4 @@ pip install wfdb scikit-learn matplotlib scipy
 !pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy
 !git clone https://FBI223:TOKEN_KEY@github.com/FBI223/EKG_PROJEKT.git
 !cd EKG_PROJEKT
-!python EKG_PROJEKT/main.py
-
-
-%cd /content/EKG_PROJEKT
-!git pull origin main
-
-!git reset --hard
-!git pull origin main
+!python /content/EKG_PROJEKT/main.py
