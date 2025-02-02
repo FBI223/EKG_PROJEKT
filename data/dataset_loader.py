@@ -3,9 +3,8 @@ import numpy as np
 import wfdb
 from scipy.interpolate import interp1d
 from scipy.signal import find_peaks
-
-from utils.preprocessing import preprocess_signal, normalize_signal
-
+from utils.preprocessing import normalize_signal, create_label_map
+from config import NUM_SAMPLES  # Importujemy stałą
 
 def load_ecg_record(record_name, directory="data/raw/mitdb/"):
     """
@@ -18,7 +17,7 @@ def load_ecg_record(record_name, directory="data/raw/mitdb/"):
     return record.p_signal, annotation.sample, annotation.symbol, record.fs
 
 
-def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples=300):
+def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples=NUM_SAMPLES):
     """
     Interpoluje segment EKG do stałej liczby próbek, jednocześnie zachowując względne położenie adnotacji.
 
@@ -58,7 +57,7 @@ def detect_qrs(signal, fs):
     return peaks
 
 
-def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples=300):
+def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples=NUM_SAMPLES):
     """
     Segmentuje EKG na podstawie QRS → QRS i przeskalowuje do stałej długości.
 
@@ -72,11 +71,7 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples=300):
     segments = []
     segment_labels = []
 
-    label_map = {
-        'N': 0, 'V': 1, 'Q': 2, 'A': 3, 'F': 4, 'f': 5, 'S': 6, 'J': 7, 'L': 8,
-        'R': 9, 'j': 10, 'E': 11, '/': 12, '|': 13, '~': 14, '!': 15, 'a': 16,
-        'x': 17, '[': 18, ']': 19, '"': 20, 'e': 21, '+': 22  # Dodano '+'
-    }
+    label_map = create_label_map("data/raw/mitdb/")
 
     for i in range(len(qrs_peaks) - 1):
         start = qrs_peaks[i]
@@ -124,7 +119,7 @@ def visualize_signal_changes(signal, processed_signal, record_name):
 
 
 
-def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=300):
+def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
     """
     Wczytuje wszystkie pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN (bez one-hot encoding).
 
@@ -151,7 +146,7 @@ def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=300):
             qrs_peaks = detect_qrs(signal, record.fs)
 
             # **Segmentacja według QRS**
-            X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples)
+            X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, NUM_SAMPLES)
 
             all_segments.append(X)
             all_labels.append(y)

@@ -4,14 +4,73 @@
 # scikit-learn
 # matplotlib
 # scipy
-# tensorflow.keras
 # cudatoolkit
 
 
-# run following command to install packages
-# pip install tensorflow numpy wfdb scikit-learn matplotlib scipy tensorflow.keras cudatoolkit
+conda create --name ekg_gpu python=3.10 -y
+conda activate ekg_gpu
+conda install -c conda-forge cudatoolkit=11.8 tensorflow -y
+pip install numpy wfdb scikit-learn matplotlib scipy
 
 
-#conda install -y tensorflow numpy scipy matplotlib scikit-learn
-#conda install -y -c conda-forge wfdb
-#conda install -y -c conda-forge cudatoolkit=11.8
+
+
+
+
+
+
+
+
+na wsl
+
+sudo apt install gcc-10 g++-10
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+
+wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
+sudo sh cuda_11.8.0_520.61.05_linux.run
+
+
+echo 'export PATH=/usr/local/cuda-11.8/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+
+
+
+( pobierz manualnie cudn 8.6.0 )
+mv /mnt/c/Users/msztu/Downloads/cudnn.deb /tmp/
+sudo cp /var/cudnn-local-repo-ubuntu2204-8.6.0.163/cudnn-local-FAED14DD-keyring.gpg /usr/share/keyrings/
+sudo apt update
+sudo apt install libcudnn8 libcudnn8-dev
+echo 'export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+
+
+sudo dpkg -i /tmp/cudnn.deb
+sudo apt update
+
+
+
+conda deactivate
+conda remove --name ekg --all -y
+conda create --name ekg python=3.10 -y
+conda activate ekg
+pip install --upgrade pip setuptools==58.2.0 wheel
+pip install --upgrade packaging
+pip install tensorflow-gpu==2.10
+pip install numpy wfdb scikit-learn matplotlib scipy
+pip uninstall numpy -y
+pip install "numpy<2"
+sudo apt install libnvinfer7 libnvinfer-plugin7
+
+python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+
+
+
+drugi wsl
+
+
+
+
+

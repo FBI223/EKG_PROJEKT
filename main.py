@@ -2,17 +2,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.models import load_model
+from config import NUM_SAMPLES
 from data.dataset_loader import prepare_qrs_dataset
 from models.cnn_model import build_cnn
+import tensorflow as tf
 
 
 def main():
     """Główny skrypt uruchamiający przetwarzanie EKG i trening modelu CNN."""
 
+
+    print("Wykryte GPU:", tf.config.list_physical_devices('GPU'))
+    return
+
+
     # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
-    X, y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=300)
+    X, y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES)
 
     # **2️⃣ Sprawdzenie liczby próbek w każdej klasie**
     unique_classes, class_counts = np.unique(y, return_counts=True)
@@ -51,14 +57,14 @@ def main():
     X_test = np.expand_dims(X_test, axis=-1)
 
     # **7️⃣ Definiowanie modelu CNN**
-    input_shape = (300, 1)  # 250 próbek na segment, 1 kanał
+    input_shape = (NUM_SAMPLES, 1)  # 300 próbek na segment, 1 kanał
     model = build_cnn(input_shape, num_classes)
 
     # **8️⃣ Trenowanie modelu**
     print("🚀 Rozpoczęcie treningu...")
     history = model.fit(
         X_train, to_categorical(y_train, num_classes),
-        epochs=30,
+        epochs=20,
         batch_size=32,
         validation_data=(X_test, to_categorical(y_test, num_classes))
     )
