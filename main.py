@@ -5,13 +5,23 @@ from tensorflow.keras.utils import to_categorical
 from config import NUM_SAMPLES
 from data.dataset_loader import prepare_qrs_dataset
 from models.cnn_model import build_cnn
+from tensorflow.python.client import device_lib
 import tensorflow as tf
 
 
 def main():
     """Główny skrypt uruchamiający przetwarzanie EKG i trening modelu CNN."""
 
+    # ** 0 sprawdzenie gpu na ktorym trenujemy **
+    for gpu in tf.config.experimental.list_physical_devices('GPU'):
+        details = tf.config.experimental.get_device_details(gpu)
+        print(f"Urządzenie: {gpu}")
+        print(f"Szczegóły: {details}")
 
+    print("Urządzenie domyślne dla obliczeń:", tf.test.gpu_device_name())
+    print(device_lib.list_local_devices())
+
+    return
 
 
     # **1️⃣ Wczytanie danych**

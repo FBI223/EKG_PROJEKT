@@ -26,3 +26,8 @@ pip install "numpy<2"
 pip install wfdb scikit-learn matplotlib scipy
 
 
+!pip uninstall -y tensorflow numpy
+!pip install "tensorflow<2.11" "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy
+!git clone https://FBI223:TOKEN_KEY@github.com/FBI223/EKG_PROJEKT.git
+!cd EKG_PROJEKT
+
