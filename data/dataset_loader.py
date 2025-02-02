@@ -6,6 +6,8 @@ from scipy.signal import find_peaks
 from utils.preprocessing import normalize_signal, create_label_map
 from config import NUM_SAMPLES  # Importujemy stałą
 
+
+
 def load_ecg_record(record_name, directory="data/raw/mitdb/"):
     """
     Wczytuje EKG i adnotacje z MIT-BIH.
