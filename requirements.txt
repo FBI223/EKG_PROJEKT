@@ -13,6 +13,8 @@ conda create --name ekg_gpu python=3.10 -y
 conda activate ekg_gpu
 conda install -c conda-forge cudatoolkit=11.8 tensorflow -y
 pip install numpy wfdb scikit-learn matplotlib scipy
+pip install jupyter jupyter_http_over_ws
+
 
 
 
@@ -24,6 +26,7 @@ pip install "tensorflow<2.11"
 pip uninstall numpy -y
 pip install "numpy<2"
 pip install wfdb scikit-learn matplotlib scipy
+pip install jupyter jupyter_http_over_ws
 
 
 !pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy
