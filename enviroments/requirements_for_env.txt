@@ -33,5 +33,5 @@ pip install jupyter jupyter_http_over_ws
 !git clone https://FBI223:TOKEN_KEY@github.com/FBI223/EKG_PROJEKT.git
 %cd /content/EKG_PROJEKT
 !git pull origin master
-!python /content/EKG_PROJEKT/main.py
+!python /content/EKG_PROJEKT/main.py-
 

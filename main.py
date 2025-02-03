@@ -1,13 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from config import NUM_SAMPLES
-from data.dataset_loader import prepare_qrs_dataset
+from data.dataset_loader import prepare_qrs_dataset, interpolate_segment
 from models.cnn_model import build_cnn
 from tensorflow.python.client import device_lib
 import tensorflow as tf
 import os
+
 
 
 
@@ -16,17 +18,8 @@ def main():
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 0 = DEBUG, 1 = INFO, 2 = WARNING, 3 = ERROR
 
-    # ** 0 sprawdzenie gpu na ktorym trenujemy **
-    for gpu in tf.config.experimental.list_physical_devices('GPU'):
-        details = tf.config.experimental.get_device_details(gpu)
-        print(f"Urządzenie: {gpu}")
-        print(f"Szczegóły: {details}")
-
     print("Urządzenie domyślne dla obliczeń:", tf.test.gpu_device_name())
     print(device_lib.list_local_devices())
-
-    return
-
 
     # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
@@ -72,21 +65,31 @@ def main():
     input_shape = (NUM_SAMPLES, 1)  # 300 próbek na segment, 1 kanał
     model = build_cnn(input_shape, num_classes)
 
-    # **8️⃣ Trenowanie modelu**
+    # **8️⃣ Definicja callbacków (EarlyStopping + ReduceLROnPlateau)**
+    early_stopping = EarlyStopping(
+        monitor='val_loss', patience=5, restore_best_weights=True, verbose=1
+    )
+
+    reduce_lr = ReduceLROnPlateau(
+        monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6, verbose=1
+    )
+
+    # **9️⃣ Trenowanie modelu**
     print("🚀 Rozpoczęcie treningu...")
     history = model.fit(
         X_train, to_categorical(y_train, num_classes),
         epochs=20,
         batch_size=32,
-        validation_data=(X_test, to_categorical(y_test, num_classes))
+        validation_data=(X_test, to_categorical(y_test, num_classes)),
+        callbacks=[early_stopping, reduce_lr]  # ⬅️ Dodane callbacki
     )
 
-    # **9️⃣ Ewaluacja modelu**
+    # **🔟 Ewaluacja modelu**
     print("📊 Ewaluacja modelu na zbiorze testowym...")
     loss, accuracy = model.evaluate(X_test, to_categorical(y_test, num_classes))
     print(f"🎯 Test Accuracy: {accuracy:.4f}")
 
-    # **🔟 Zapisanie modelu w różnych formatach**
+    # **💾 Zapisanie modelu w różnych formatach**
     model.save("models/cnn_ekg.h5")  # HDF5 format
     model.save("models/cnn_ekg.keras")  # Nowy format Keras
     model.save("models/cnn_ekg")  # Format TensorFlow (model jako folder)

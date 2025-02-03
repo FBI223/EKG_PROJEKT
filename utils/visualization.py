@@ -156,3 +156,30 @@ def plot_qrs_cycles(segments):
     plt.show()
 
 
+def visualize_interpolation(segment_resized, new_annotations, num_samples):
+    """
+    Wizualizuje interpolowany fragment EKG wraz z nowymi adnotacjami.
+
+    :param segment_resized: Interpolowany fragment sygnału EKG
+    :param new_annotations: Nowe pozycje adnotacji po interpolacji
+    :param num_samples: Docelowa liczba próbek w interpolacji
+    :param segment_index: Indeks segmentu w całym sygnale
+    """
+    x_interpolated = np.linspace(0, 1, num_samples)
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(x_interpolated, segment_resized, label="Interpolowany", color="orange", linewidth=1.5)
+
+
+    # **Dodanie adnotacji jako zielone kropki**
+    annotation_x = new_annotations / num_samples  # Normalizacja pozycji adnotacji
+    annotation_y = segment_resized[new_annotations]  # Pobranie wartości amplitudy
+
+    plt.scatter(annotation_x, annotation_y, color='green', marker='o', label="Nowe adnotacje")
+
+    plt.legend()
+    plt.title(f"Interpolacja segmentu QRS")
+    plt.xlabel("Normalizowany czas")
+    plt.ylabel("Amplituda")
+    plt.grid()
+    plt.show()

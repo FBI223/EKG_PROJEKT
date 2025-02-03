@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 from scipy.signal import find_peaks
 from utils.preprocessing import normalize_signal, create_label_map
 from config import NUM_SAMPLES  # Importujemy stałą
-
+from utils.visualization import visualize_interpolation
 
 
 def load_ecg_record(record_name, directory="data/raw/mitdb/"):
@@ -19,36 +19,38 @@ def load_ecg_record(record_name, directory="data/raw/mitdb/"):
     return record.p_signal, annotation.sample, annotation.symbol, record.fs
 
 
-def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples=NUM_SAMPLES):
+def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples):
     """
-    Interpoluje segment EKG do stałej liczby próbek, jednocześnie zachowując względne położenie adnotacji.
+    Interpoluje segment EKG do stałej liczby próbek, jednocześnie zachowując dokładne położenie adnotacji.
 
     :param segment: Oryginalny fragment sygnału EKG (numpy array)
-    :param annotations: Lista adnotacji w oryginalnym segmencie
+    :param annotations: Lista adnotacji w oryginalnym segmencie (lista indeksów)
     :param segment_start: Indeks początku segmentu w oryginalnym sygnale
     :param segment_end: Indeks końca segmentu w oryginalnym sygnale
     :param num_samples: Docelowa liczba próbek w segmencie
     :return: Interpolowany segment, nowe pozycje adnotacji
     """
     if len(segment) == num_samples:
-        return segment, annotations  # Jeśli długość już jest prawidłowa, nic nie zmieniamy
+        return segment, np.array(annotations, dtype=int)  # Jeśli długość już jest prawidłowa, nic nie zmieniamy
 
-    # Stworzenie siatki interpolacyjnej
-    x_old = np.linspace(0, 1, len(segment))
-    x_new = np.linspace(0, 1, num_samples)
-    interpolator = interp1d(x_old, segment, kind='linear')
+    # **Interpolacja sygnału**
+    x_old = np.linspace(0, 1, len(segment))  # Oryginalna siatka czasowa
+    x_new = np.linspace(0, 1, num_samples)  # Nowa siatka czasowa
+    interpolator = interp1d(x_old, segment, kind='linear', fill_value="extrapolate")
     segment_resized = interpolator(x_new)
 
-    # Przeskalowanie adnotacji do nowego przedziału
+    # **Skalowanie adnotacji do nowej długości**
     new_annotations = []
-    scale_factor = num_samples / (segment_end - segment_start)
-
     for ann in annotations:
         if segment_start <= ann < segment_end:
-            rel_pos = (ann - segment_start) * scale_factor
-            new_annotations.append(int(rel_pos))  # Nowa pozycja adnotacji po interpolacji
+            rel_pos = (ann - segment_start) / (segment_end - segment_start)  # Pozycja w zakresie [0,1]
+            new_index = round(rel_pos * (num_samples - 1))  # 🟢 Poprawiona linia
+            new_annotations.append(new_index)
 
-    return segment_resized, np.array(new_annotations)
+    # **Zabezpieczenie przed błędami indeksowania**
+    new_annotations = np.clip(new_annotations, 0, num_samples - 1)
+
+    return segment_resized, np.array(new_annotations, dtype=int)
 
 
 def detect_qrs(signal, fs):
@@ -90,6 +92,7 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples=NUM_S
         segment_resized, new_annotations = interpolate_segment(
             segment, [ann for ann, _ in segment_events], start, end, num_samples
         )
+
 
         # Jeśli są adnotacje, wybieramy dominującą klasę, jeśli nie, przypisujemy "N" (normalny rytm)
         if segment_events:
