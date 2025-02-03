@@ -7,10 +7,14 @@ from data.dataset_loader import prepare_qrs_dataset
 from models.cnn_model import build_cnn
 from tensorflow.python.client import device_lib
 import tensorflow as tf
+import os
+
 
 
 def main():
     """Główny skrypt uruchamiający przetwarzanie EKG i trening modelu CNN."""
+
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 0 = DEBUG, 1 = INFO, 2 = WARNING, 3 = ERROR
 
     # ** 0 sprawdzenie gpu na ktorym trenujemy **
     for gpu in tf.config.experimental.list_physical_devices('GPU'):
