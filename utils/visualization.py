@@ -3,6 +3,8 @@ import wfdb
 import os
 import numpy as np
 
+from data.dataset_loader import load_ecg_record
+
 
 def describe_annotations(annotations):
     """
@@ -36,6 +38,71 @@ def describe_annotations(annotations):
     for label, count in annotations.items():
         description = descriptions.get(label, "Brak opisu (może być niestandardowe)")
         print(f" - **{label}** ({count} razy): {description}")
+
+
+import wfdb
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_ecg_record(record_path, selected_channel=None, n_subplots=1):
+    """
+    Tworzy oddzielne, szerokie wykresy dla każdego segmentu sygnału EKG.
+
+    :param record_path: Ścieżka do rekordu, np. 'data/raw/mitdb/100'
+    :param selected_channel: Nazwa kanału, np. 'MLII' lub 'V5'. Jeśli None, rysuje wszystkie.
+    :param n_subplots: Liczba osobnych wykresów (podział danych na segmenty).
+    """
+    # Wczytanie rekordu
+    record = wfdb.rdrecord(record_path)
+
+    # Pobranie danych
+    signals = record.p_signal
+    leads = record.sig_name  # Nazwy odprowadzeń
+    fs = record.fs  # Częstotliwość próbkowania
+    time = np.arange(signals.shape[0]) / fs  # Oś czasu w sekundach
+
+    # Jeśli użytkownik wybrał konkretny kanał, sprawdzamy czy istnieje
+    if selected_channel and selected_channel in leads:
+        channel_idx = leads.index(selected_channel)
+        signals = signals[:, channel_idx:channel_idx+1]
+        leads = [selected_channel]
+
+    # Podział sygnału na `n_subplots` segmentów
+    segment_length = len(signals[:, 0]) // n_subplots
+
+    for j in range(n_subplots):
+        start = j * segment_length
+        end = start + segment_length if j < n_subplots - 1 else len(signals[:, 0])
+
+        plt.figure(figsize=(150, 5))  # Każdy wykres na pełną szerokość ekranu
+
+        for i in range(signals.shape[1]):
+            plt.plot(time[start:end], signals[start:end, i], label=f"{leads[i]}", linewidth=1, color="b")
+
+            # Adnotacje dla min/max w danym segmencie
+            min_idx = np.argmin(signals[start:end, i]) + start
+            max_idx = np.argmax(signals[start:end, i]) + start
+
+            plt.annotate(f"Min: {signals[min_idx, i]:.2f} mV",
+                         xy=(time[min_idx], signals[min_idx, i]),
+                         xytext=(time[min_idx] + 0.5, signals[min_idx, i] - 0.5),
+                         arrowprops=dict(facecolor='red', shrink=0.05),
+                         fontsize=12, color='red')
+
+            plt.annotate(f"Max: {signals[max_idx, i]:.2f} mV",
+                         xy=(time[max_idx], signals[max_idx, i]),
+                         xytext=(time[max_idx] - 0.5, signals[max_idx, i] + 0.5),
+                         arrowprops=dict(facecolor='green', shrink=0.05),
+                         fontsize=12, color='green')
+
+        plt.xlabel("Czas (s)")
+        plt.ylabel("Napięcie (mV)")
+        plt.title(f"Odczyt EKG: {leads[i]} (Segment {j+1}/{n_subplots})")
+        plt.grid()
+        plt.legend()
+        plt.show()  # Każdy segment otwiera nowy wykres
+
+
 
 
 def plot_ecg_with_labels(record_name, signal, annotations, labels, fs=360, start_time=None, end_time=None, padding=2):
@@ -183,3 +250,5 @@ def visualize_interpolation(segment_resized, new_annotations, num_samples):
     plt.ylabel("Amplituda")
     plt.grid()
     plt.show()
+
+

@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import wfdb
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
@@ -10,7 +11,7 @@ from tensorflow.python.client import device_lib
 import tensorflow as tf
 import os
 
-
+from utils.visualization import plot_ecg_record
 
 
 def main():
@@ -21,7 +22,22 @@ def main():
     print("Urządzenie domyślne dla obliczeń:", tf.test.gpu_device_name())
     print(device_lib.list_local_devices())
 
-    # **1️⃣ Wczytanie danych**
+
+    #record = wfdb.rdrecord('data/raw/mitdb/100')
+    #wfdb.plot_wfdb(record)
+
+    # Przykłady użycia:
+    # 1. Podziel 'MLII' na 50 oddzielnych wykresów (każdy w osobnym oknie)
+    plot_ecg_record('data/raw/mitdb/100', selected_channel='MLII', n_subplots=50)
+
+    # 2. Podziel 'V5' na 20 oddzielnych wykresów
+    plot_ecg_record('data/raw/mitdb/100', selected_channel='V5', n_subplots=20)
+
+
+    return
+
+
+# **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
     X, y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES)
 

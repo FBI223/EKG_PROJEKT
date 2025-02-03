@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 from scipy.signal import find_peaks
 from utils.preprocessing import normalize_signal, create_label_map
 from config import NUM_SAMPLES  # Importujemy stałą
-from utils.visualization import visualize_interpolation
+
 
 
 def load_ecg_record(record_name, directory="data/raw/mitdb/"):
@@ -106,20 +106,6 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples=NUM_S
 
     return np.array(segments), np.array(segment_labels)
 
-
-
-import matplotlib.pyplot as plt
-
-def visualize_signal_changes(signal, processed_signal, record_name):
-    """Porównuje sygnał EKG przed i po normalizacji."""
-    plt.figure(figsize=(12, 5))
-    plt.plot(signal[:1000], label="Oryginalny sygnał", alpha=0.7)
-    plt.plot(processed_signal[:1000], label="Po normalizacji", alpha=0.7)
-    plt.xlabel("Czas (próbki)")
-    plt.ylabel("Amplituda")
-    plt.title(f"Porównanie sygnału przed i po preprocessingu ({record_name})")
-    plt.legend()
-    plt.show()
 
 
 
