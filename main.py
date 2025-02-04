@@ -23,21 +23,20 @@ def main():
     print(device_lib.list_local_devices())
 
 
-    #record = wfdb.rdrecord('data/raw/mitdb/100')
-    #wfdb.plot_wfdb(record)
-
     # Przykłady użycia:
-    # 1. Podziel 'MLII' na 50 oddzielnych wykresów (każdy w osobnym oknie)
-    plot_ecg_record('data/raw/mitdb/100', selected_channel='MLII', n_subplots=50)
-
-    # 2. Podziel 'V5' na 20 oddzielnych wykresów
-    plot_ecg_record('data/raw/mitdb/100', selected_channel='V5', n_subplots=20)
+    # 1. Podziel 'MLII' na 60 oddzielnych wykresów (każdy w osobnym oknie)
+    #plot_ecg_record('data/raw/mitdb/100', selected_channel='MLII')
 
 
-    return
 
 
-# **1️⃣ Wczytanie danych**
+
+
+
+
+
+
+    # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
     X, y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES)
 
@@ -104,6 +103,13 @@ def main():
     print("📊 Ewaluacja modelu na zbiorze testowym...")
     loss, accuracy = model.evaluate(X_test, to_categorical(y_test, num_classes))
     print(f"🎯 Test Accuracy: {accuracy:.4f}")
+
+
+
+
+
+
+
 
     # **💾 Zapisanie modelu w różnych formatach**
     model.save("models/cnn_ekg.h5")  # HDF5 format

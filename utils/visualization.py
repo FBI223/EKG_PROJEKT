@@ -3,109 +3,100 @@ import wfdb
 import os
 import numpy as np
 
-from data.dataset_loader import load_ecg_record
 
-
-def describe_annotations(annotations):
+def plot_ecg_signal(signal, fs, segment_duration=30):
     """
-    Dodaje opisy do znalezionych adnotacji w MIT-BIH.
+    Rysuje i zapisuje wykresy EKG w segmentach o określonym czasie.
 
-    :param annotations: Słownik {adnotacja: liczba wystąpień}
+    :param signal: Tablica wartości sygnału EKG.
+    :param fs: Częstotliwość próbkowania sygnału.
+    :param segment_duration: Długość każdego segmentu w sekundach.
     """
-    descriptions = {
-        'N': "Normalny rytm serca (QRS)",
-        'V': "Przedwczesne pobudzenie komorowe (PVC)",
-        'S': "Nadkomorowe pobudzenie",
-        'F': "Fusion beat (hybrydowe pobudzenie)",
-        'Q': "Nieokreślona arytmia",
-        '~': "Artefakt (zakłócenia sygnału)",
-        '|': "Separator rytmu",
-        '/': "Początek nowego segmentu rytmu",
-        'f': "Flutter (przelotna arytmia)",
-        '+': "Komentarz lekarza (ignorowany)",
-        'A': "Pobudzenie nadkomorowe",
-        'E': "Pobudzenie ektopowe",
-        'J': "Junctional beat (z węzła AV)",
-        'L': "Lewogram (wariant QRS)",
-        'R': "Pobudzenie rytmu węzłowego",
-        'P': "Pobudzenie przedsionkowe",
-        'B': "Blok przedsionkowo-komorowy",
-        'T': "T-wave (zmiany w załamku T)",
-        'Z': "Nieznana zmiana",
-    }
+    time = np.arange(len(signal)) / fs  # Oś czasu w sekundach
+    total_duration = len(signal) / fs  # Całkowity czas w sekundach
+    num_segments = int(np.ceil(total_duration / segment_duration))
+    save_folder = "visualization_temp_signal"
+    os.makedirs(save_folder, exist_ok=True)
 
-    print("\n📌 **Lista znalezionych adnotacji:**")
-    for label, count in annotations.items():
-        description = descriptions.get(label, "Brak opisu (może być niestandardowe)")
-        print(f" - **{label}** ({count} razy): {description}")
+    for j in range(num_segments):
+        start_idx = int(j * segment_duration * fs)
+        end_idx = int(min((j + 1) * segment_duration * fs, len(signal)))
+
+        plt.figure(figsize=(100, 4))
+        plt.plot(time[start_idx:end_idx], signal[start_idx:end_idx], color="b", linewidth=1)
+        plt.xlabel("Czas (s)")
+        plt.ylabel("Napięcie (mV)")
+        plt.title(f"Segment {j+1}")
+
+        save_path = os.path.join(save_folder, f"ecg_segment_{j+1}.png")
+        plt.savefig(save_path, dpi=100, bbox_inches='tight')
+        print(f"📁 Wykres zapisany: {save_path}")
+        plt.close()
 
 
-import wfdb
-import matplotlib.pyplot as plt
-import numpy as np
 
-def plot_ecg_record(record_path, selected_channel=None, n_subplots=1):
+def plot_ecg_record(record_path, selected_channel=None, segment_duration=30):
     """
-    Tworzy oddzielne, szerokie wykresy dla każdego segmentu sygnału EKG.
+    Rysuje i zapisuje wykresy EKG w segmentach o określonym czasie.
 
     :param record_path: Ścieżka do rekordu, np. 'data/raw/mitdb/100'
-    :param selected_channel: Nazwa kanału, np. 'MLII' lub 'V5'. Jeśli None, rysuje wszystkie.
-    :param n_subplots: Liczba osobnych wykresów (podział danych na segmenty).
+    :param selected_channel: Nazwa kanału, np. 'MLII' lub 'V5'. Jeśli None, wybiera pierwszy dostępny.
+    :param segment_duration: Długość każdego segmentu w sekundach.
+    :param image_width: Szerokość każdego obrazka w pikselach.
     """
-    # Wczytanie rekordu
+    # Wczytanie rekordu i adnotacji
     record = wfdb.rdrecord(record_path)
+    annotation = wfdb.rdann(record_path, 'atr')
 
-    # Pobranie danych
+    # Pobranie danych sygnałowych
     signals = record.p_signal
     leads = record.sig_name  # Nazwy odprowadzeń
     fs = record.fs  # Częstotliwość próbkowania
-    time = np.arange(signals.shape[0]) / fs  # Oś czasu w sekundach
 
-    # Jeśli użytkownik wybrał konkretny kanał, sprawdzamy czy istnieje
+    # Wybór kanału
     if selected_channel and selected_channel in leads:
         channel_idx = leads.index(selected_channel)
-        signals = signals[:, channel_idx:channel_idx+1]
-        leads = [selected_channel]
+    else:
+        channel_idx = 0  # Domyślnie wybiera pierwszy kanał
 
-    # Podział sygnału na `n_subplots` segmentów
-    segment_length = len(signals[:, 0]) // n_subplots
+    signal = signals[:, channel_idx]  # Pobranie wybranego kanału
+    time = np.arange(signal.shape[0]) / fs  # Oś czasu w sekundach
 
-    for j in range(n_subplots):
-        start = j * segment_length
-        end = start + segment_length if j < n_subplots - 1 else len(signals[:, 0])
+    # Pobranie adnotacji
+    annotation_positions = annotation.sample / fs  # Konwersja na sekundy
+    annotation_labels = annotation.symbol
 
-        plt.figure(figsize=(150, 5))  # Każdy wykres na pełną szerokość ekranu
+    # Ustalenie liczby segmentów
+    total_duration = len(signal) / fs  # Całkowity czas w sekundach
+    num_segments = int(np.ceil(total_duration / segment_duration))
 
-        for i in range(signals.shape[1]):
-            plt.plot(time[start:end], signals[start:end, i], label=f"{leads[i]}", linewidth=1, color="b")
+    # Tworzenie folderu na wykresy
+    save_folder = "visualization_temp_record"
+    os.makedirs(save_folder, exist_ok=True)
 
-            # Adnotacje dla min/max w danym segmencie
-            min_idx = np.argmin(signals[start:end, i]) + start
-            max_idx = np.argmax(signals[start:end, i]) + start
+    for j in range(num_segments):
+        start_idx = int(j * segment_duration * fs)
+        end_idx = int(min((j + 1) * segment_duration * fs, len(signal)))
 
-            plt.annotate(f"Min: {signals[min_idx, i]:.2f} mV",
-                         xy=(time[min_idx], signals[min_idx, i]),
-                         xytext=(time[min_idx] + 0.5, signals[min_idx, i] - 0.5),
-                         arrowprops=dict(facecolor='red', shrink=0.05),
-                         fontsize=12, color='red')
+        plt.figure(figsize=( 100 , 4 ))  # Konwersja szerokości na cal (100 dpi)
+        plt.plot(time[start_idx:end_idx], signal[start_idx:end_idx], color="b", linewidth=1)
 
-            plt.annotate(f"Max: {signals[max_idx, i]:.2f} mV",
-                         xy=(time[max_idx], signals[max_idx, i]),
-                         xytext=(time[max_idx] - 0.5, signals[max_idx, i] + 0.5),
-                         arrowprops=dict(facecolor='green', shrink=0.05),
-                         fontsize=12, color='green')
+        # Dodawanie adnotacji
+        for pos, label in zip(annotation_positions, annotation_labels):
+            if time[start_idx] <= pos <= time[end_idx - 1]:
+                plt.scatter(pos, signal[int(pos * fs)], color='red', marker='o')
+                plt.text(pos, signal[int(pos * fs)], label, fontsize=10, verticalalignment='bottom', color='red')
 
-        plt.xlabel("Czas (s)")
-        plt.ylabel("Napięcie (mV)")
-        plt.title(f"Odczyt EKG: {leads[i]} (Segment {j+1}/{n_subplots})")
-        plt.grid()
-        plt.legend()
-        plt.show()  # Każdy segment otwiera nowy wykres
+        # Zapisywanie wykresu
+        save_path = os.path.join(save_folder, f"{os.path.basename(record_path)}_segment_{j+1}.png")
+        plt.savefig(save_path, dpi=100, bbox_inches='tight')
+        print(f"📁 Wykres zapisany: {save_path}")
 
-
+        plt.close()  # Zamknięcie wykresu po zapisie
 
 
-def plot_ecg_with_labels(record_name, signal, annotations, labels, fs=360, start_time=None, end_time=None, padding=2):
+
+def plot_full_ecg_record(record_name, signal, annotations, labels, fs=360, start_time=None, end_time=None, padding=2):
     """
     Rysuje wykres EKG z buforem i poprawionym układem wykresu.
 
@@ -204,23 +195,6 @@ def plot_ecg_with_labels(record_name, signal, annotations, labels, fs=360, start
 
     plt.show()
 
-
-
-
-
-def plot_qrs_cycles(segments):
-    """
-    Rysuje wykres pierwszych 5 cykli serca po segmentacji QRS.
-    """
-    plt.figure(figsize=(20, 6))
-    for i in range(min(3, len(segments))):
-        plt.plot(segments[i], label=f"Cykł {i+1}")
-
-    plt.legend()
-    plt.title("Segmentacja na pełne cykle serca (QRS → QRS)")
-    plt.xlabel("Próbki w cyklu")
-    plt.ylabel("Amplituda")
-    plt.show()
 
 
 def visualize_interpolation(segment_resized, new_annotations, num_samples):

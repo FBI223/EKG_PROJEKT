@@ -3,8 +3,9 @@ import numpy as np
 import wfdb
 from scipy.interpolate import interp1d
 from scipy.signal import find_peaks
-from utils.preprocessing import normalize_signal, create_label_map
+from utils.preprocessing import create_label_map, standarize_signal
 from config import NUM_SAMPLES  # Importujemy stałą
+
 
 
 
@@ -21,36 +22,23 @@ def load_ecg_record(record_name, directory="data/raw/mitdb/"):
 
 def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples):
     """
-    Interpoluje segment EKG do stałej liczby próbek, jednocześnie zachowując dokładne położenie adnotacji.
-
-    :param segment: Oryginalny fragment sygnału EKG (numpy array)
-    :param annotations: Lista adnotacji w oryginalnym segmencie (lista indeksów)
-    :param segment_start: Indeks początku segmentu w oryginalnym sygnale
-    :param segment_end: Indeks końca segmentu w oryginalnym sygnale
-    :param num_samples: Docelowa liczba próbek w segmencie
-    :return: Interpolowany segment, nowe pozycje adnotacji
+    Interpoluje segment EKG do stałej liczby próbek, zachowując dokładne położenie adnotacji.
     """
     if len(segment) == num_samples:
-        return segment, np.array(annotations, dtype=int)  # Jeśli długość już jest prawidłowa, nic nie zmieniamy
+        return segment, np.array(annotations, dtype=int)
 
-    # **Interpolacja sygnału**
-    x_old = np.linspace(0, 1, len(segment))  # Oryginalna siatka czasowa
-    x_new = np.linspace(0, 1, num_samples)  # Nowa siatka czasowa
+    # Interpolacja sygnału
+    x_old = np.linspace(0, len(segment) - 1, len(segment))
+    x_new = np.linspace(0, len(segment) - 1, num_samples)
     interpolator = interp1d(x_old, segment, kind='linear', fill_value="extrapolate")
     segment_resized = interpolator(x_new)
 
-    # **Skalowanie adnotacji do nowej długości**
-    new_annotations = []
-    for ann in annotations:
-        if segment_start <= ann < segment_end:
-            rel_pos = (ann - segment_start) / (segment_end - segment_start)  # Pozycja w zakresie [0,1]
-            new_index = round(rel_pos * (num_samples - 1))  # 🟢 Poprawiona linia
-            new_annotations.append(new_index)
+    # Przeskalowanie adnotacji BEZ normalizacji!
+    scale_factor = num_samples / len(segment)
+    new_annotations = [(ann - segment_start) * scale_factor for ann in annotations if segment_start <= ann < segment_end]
+    new_annotations = np.clip(np.round(new_annotations).astype(int), 0, num_samples - 1)
 
-    # **Zabezpieczenie przed błędami indeksowania**
-    new_annotations = np.clip(new_annotations, 0, num_samples - 1)
-
-    return segment_resized, np.array(new_annotations, dtype=int)
+    return segment_resized, new_annotations
 
 
 def detect_qrs(signal, fs):
@@ -108,41 +96,24 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples=NUM_S
 
 
 
-
-
 def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
-    """
-    Wczytuje wszystkie pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN (bez one-hot encoding).
+    """ Wczytuje pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN. """
+    all_segments, all_labels = [], []
+    files = [f.split('.')[0] for f in os.listdir(directory) if f.endswith('.dat')]
 
-    :param directory: Ścieżka do bazy MIT-BIH.
-    :param num_samples: Docelowa liczba próbek w każdym segmencie.
-    :return: X (sygnały EKG), y (etykiety numeryczne)
-    """
-    all_segments = []
-    all_labels = []
+    for record_name in files:
+        record_path = os.path.join(directory, record_name)
+        record = wfdb.rdrecord(record_path)
+        annotation = wfdb.rdann(record_path, 'atr')
 
-    for filename in os.listdir(directory):
-        if filename.endswith(".dat"):
-            record_name = filename.split('.')[0]
-            record = wfdb.rdrecord(os.path.join(directory, record_name))
-            annotation = wfdb.rdann(os.path.join(directory, record_name), 'atr')
 
-            signal = record.p_signal[:, 0]  # Używamy tylko pierwszego kanału
-            signal = normalize_signal(signal)
+        signal = standarize_signal(record.p_signal[:, 0])
+        annotations, labels = annotation.sample, annotation.symbol
+        qrs_peaks = detect_qrs(signal, record.fs)
+        X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples)
 
-            annotations = annotation.sample
-            labels = annotation.symbol
-
-            # **Wykrywanie QRS**
-            qrs_peaks = detect_qrs(signal, record.fs)
-
-            # **Segmentacja według QRS**
-            X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, NUM_SAMPLES)
-
-            all_segments.append(X)
-            all_labels.append(y)
+        all_segments.append(X)
+        all_labels.append(y)
 
     return np.concatenate(all_segments), np.concatenate(all_labels)
-
-
 

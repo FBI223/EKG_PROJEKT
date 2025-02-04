@@ -6,13 +6,20 @@ import numpy as np
 from config import NUM_SAMPLES
 
 
-def normalize_signal(ecg_signal):
-    """Normalizuje sygnał EKG"""
-    return (ecg_signal - np.min(ecg_signal)) / (np.max(ecg_signal) - np.min(ecg_signal))
+# **Funkcje przetwarzania sygnału**
+def standarize_signal(ecg_signal):
+    """Standaryzacja Z-score"""
+    mean = np.mean(ecg_signal)
+    std = np.std(ecg_signal)
+    return (ecg_signal - mean) / std if std != 0 else ecg_signal
 
-def filter_signal(ecg_signal):
-    """Filtruje sygnał EKG usuwając szumy"""
-    return medfilt(ecg_signal, kernel_size=5)
+def normalize_signal(ecg_signal):
+    """Normalizacja Min-Max do przedziału [0,1]"""
+    min_val = np.min(ecg_signal)
+    max_val = np.max(ecg_signal)
+    return (ecg_signal - min_val) / (max_val - min_val) if max_val != min_val else ecg_signal
+
+
 
 
 

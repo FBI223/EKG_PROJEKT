@@ -1,10 +1,17 @@
 EKG_PROJEKT/    # Główny katalog projektu
 ├── data/                 # Przetwarzanie i wczytywanie danych
 │   ├── raw/              # Surowe pliki EKG
-│   ├── processed/        # Przetworzone dane
+│   │  ├── mit-bh v1
+│   │  ├── mit-bh v2
+│   │  ├── mit-bh v3
+│   │
 │   ├── dataset_loader.py # Moduł do wczytywania danych
+│   ├── database_format.txt
 │
 ├── models/               # Sieci neuronowe
+│   ├── trained_models/
+│   │   ├── v1 .. v100
+│   │
 │   ├── cnn_model.py      # Definicja CNN
 │   ├── train.py          # Trening modelu
 │   ├── predict.py        # Predykcja anomalii
@@ -13,9 +20,13 @@ EKG_PROJEKT/    # Główny katalog projektu
 │   ├── preprocessing.py  # Normalizacja, filtracja sygnału
 │   ├── visualization.py  # Wizualizacja wykresów
 │
+│
+├── envoriments/                # yaml i requirements dla srodowiska i bibliotek
+│   ├── conda_ekg_win_env.yml
+│   ├── ekg_gpu_wsl_env.yml
+│   ├── requirement_for_env.tx
+│
 ├── main.py               # Główny skrypt uruchamiający analizę
 ├── config.py             # Konfiguracja ścieżek i parametrów
-├── requirements.txt      # Lista zależności (tensorflow, numpy, wfdb)
 ├── README.md             # Instrukcja obsługi projektu
 ├── project_structure.txt
-├── conda_requirements.yaml
