@@ -3,46 +3,53 @@ import wfdb
 import os
 import numpy as np
 
+from config import NUM_SAMPLES
+
 
 def plot_ecg_signal(signal, fs, segment_duration=30):
     """
     Rysuje i zapisuje wykresy EKG w segmentach o określonym czasie.
 
-    :param signal: Tablica wartości sygnału EKG.
-    :param fs: Częstotliwość próbkowania sygnału.
+    :param record_path: Ścieżka do rekordu, np. 'data/raw/mitdb/100'
+    :param selected_channel: Nazwa kanału, np. 'MLII' lub 'v5'. Jeśli None, wybiera pierwszy dostępny.
     :param segment_duration: Długość każdego segmentu w sekundach.
+    :param image_width: Szerokość każdego obrazka w pikselach.
     """
-    time = np.arange(len(signal)) / fs  # Oś czasu w sekundach
+
+    time = np.arange(signal.shape[0]) / fs  # Oś czasu w sekundach
+
+    # Ustalenie liczby segmentów
     total_duration = len(signal) / fs  # Całkowity czas w sekundach
     num_segments = int(np.ceil(total_duration / segment_duration))
-    save_folder = "visualization_temp_signal"
+
+    # Tworzenie folderu na wykresy
+    save_folder = "visualization_temp_record"
     os.makedirs(save_folder, exist_ok=True)
 
     for j in range(num_segments):
         start_idx = int(j * segment_duration * fs)
         end_idx = int(min((j + 1) * segment_duration * fs, len(signal)))
 
-        plt.figure(figsize=(100, 4))
+        plt.figure(figsize=( 100 , 4 ))  # Konwersja szerokości na cal (100 dpi)
         plt.plot(time[start_idx:end_idx], signal[start_idx:end_idx], color="b", linewidth=1)
-        plt.xlabel("Czas (s)")
-        plt.ylabel("Napięcie (mV)")
-        plt.title(f"Segment {j+1}")
 
-        save_path = os.path.join(save_folder, f"ecg_segment_{j+1}.png")
+
+        # Zapisywanie wykresu
+        save_path = os.path.join(save_folder, f"_segment_{j+1}.png")
         plt.savefig(save_path, dpi=100, bbox_inches='tight')
         print(f"📁 Wykres zapisany: {save_path}")
-        plt.close()
+
+        plt.close()  # Zamknięcie wykresu po zapisie
 
 
 
 def plot_ecg_record(record_path, selected_channel=None, segment_duration=30):
     """
-    Rysuje i zapisuje wykresy EKG w segmentach o określonym czasie.
+    Rysuje i zapisuje wykresy EKG w segmentach o określonym czasie, bez nakładających się fragmentów.
 
     :param record_path: Ścieżka do rekordu, np. 'data/raw/mitdb/100'
-    :param selected_channel: Nazwa kanału, np. 'MLII' lub 'V5'. Jeśli None, wybiera pierwszy dostępny.
+    :param selected_channel: Nazwa kanału, np. 'MLII' lub 'v5'. Jeśli None, wybiera pierwszy dostępny.
     :param segment_duration: Długość każdego segmentu w sekundach.
-    :param image_width: Szerokość każdego obrazka w pikselach.
     """
     # Wczytanie rekordu i adnotacji
     record = wfdb.rdrecord(record_path)
@@ -68,24 +75,28 @@ def plot_ecg_record(record_path, selected_channel=None, segment_duration=30):
 
     # Ustalenie liczby segmentów
     total_duration = len(signal) / fs  # Całkowity czas w sekundach
-    num_segments = int(np.ceil(total_duration / segment_duration))
+    num_segments = int(total_duration // segment_duration)  # Zaokrąglamy w dół, aby segmenty były rozłączne
 
     # Tworzenie folderu na wykresy
     save_folder = "visualization_temp_record"
     os.makedirs(save_folder, exist_ok=True)
 
     for j in range(num_segments):
-        start_idx = int(j * segment_duration * fs)
-        end_idx = int(min((j + 1) * segment_duration * fs, len(signal)))
+        start_idx = j * segment_duration * fs
+        end_idx = start_idx + segment_duration * fs
 
-        plt.figure(figsize=( 100 , 4 ))  # Konwersja szerokości na cal (100 dpi)
+        # Sprawdzamy, czy nie wychodzimy poza zakres
+        end_idx = min(int(end_idx), len(signal))
+
+        plt.figure(figsize=(10, 4))
         plt.plot(time[start_idx:end_idx], signal[start_idx:end_idx], color="b", linewidth=1)
 
-        # Dodawanie adnotacji
-        for pos, label in zip(annotation_positions, annotation_labels):
-            if time[start_idx] <= pos <= time[end_idx - 1]:
-                plt.scatter(pos, signal[int(pos * fs)], color='red', marker='o')
-                plt.text(pos, signal[int(pos * fs)], label, fontsize=10, verticalalignment='bottom', color='red')
+        # Dodawanie adnotacji w zakresie segmentu
+        annotation_mask = (annotation_positions >= time[start_idx]) & (annotation_positions < time[end_idx])
+        for pos, label in zip(annotation_positions[annotation_mask], np.array(annotation_labels)[annotation_mask]):
+            ann_idx = np.searchsorted(time[start_idx:end_idx], pos)  # Znajdź najbliższy indeks
+            plt.scatter(pos, signal[start_idx + ann_idx], color='red', marker='o')
+            plt.text(pos, signal[start_idx + ann_idx], label, fontsize=10, verticalalignment='bottom', color='red')
 
         # Zapisywanie wykresu
         save_path = os.path.join(save_folder, f"{os.path.basename(record_path)}_segment_{j+1}.png")
@@ -93,7 +104,6 @@ def plot_ecg_record(record_path, selected_channel=None, segment_duration=30):
         print(f"📁 Wykres zapisany: {save_path}")
 
         plt.close()  # Zamknięcie wykresu po zapisie
-
 
 
 def plot_full_ecg_record(record_name, signal, annotations, labels, fs=360, start_time=None, end_time=None, padding=2):
@@ -195,34 +205,26 @@ def plot_full_ecg_record(record_name, signal, annotations, labels, fs=360, start
 
     plt.show()
 
-
-
-def visualize_interpolation(segment_resized, new_annotations, num_samples):
+def visualize_interpolation(signal, annotations=None):
     """
-    Wizualizuje interpolowany fragment EKG wraz z nowymi adnotacjami.
+    Rysuje interpolowany segment EKG z naniesionymi adnotacjami.
 
-    :param segment_resized: Interpolowany fragment sygnału EKG
-    :param new_annotations: Nowe pozycje adnotacji po interpolacji
-    :param num_samples: Docelowa liczba próbek w interpolacji
-    :param segment_index: Indeks segmentu w całym sygnale
+    :param signal: Interpolowany sygnał EKG (1D numpy array).
+    :param annotations: Lista indeksów adnotacji po interpolacji.
     """
-    x_interpolated = np.linspace(0, 1, num_samples)
+    plt.figure(figsize=(10, 4))
+    plt.plot(signal, color="b", linewidth=1, label="Interpolowany sygnał")
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(x_interpolated, segment_resized, label="Interpolowany", color="orange", linewidth=1.5)
+    # Dodaj adnotacje jako czerwone kropki na wykresie
+    if annotations is not None:
+        for ann in annotations:
+            plt.scatter(ann, signal[ann], color='red', marker='o', label="Adnotacja")
 
-
-    # **Dodanie adnotacji jako zielone kropki**
-    annotation_x = new_annotations / num_samples  # Normalizacja pozycji adnotacji
-    annotation_y = segment_resized[new_annotations]  # Pobranie wartości amplitudy
-
-    plt.scatter(annotation_x, annotation_y, color='green', marker='o', label="Nowe adnotacje")
-
+    plt.xlabel("Próbki")
+    plt.ylabel("Znormalizowana wartość")
+    plt.title("Interpolowany segment EKG z adnotacjami")
     plt.legend()
-    plt.title(f"Interpolacja segmentu QRS")
-    plt.xlabel("Normalizowany czas")
-    plt.ylabel("Amplituda")
-    plt.grid()
     plt.show()
+
 
 

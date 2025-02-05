@@ -1,10 +1,14 @@
 import os
 import numpy as np
 import wfdb
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, CubicSpline
 from scipy.signal import find_peaks
-from utils.preprocessing import create_label_map, standarize_signal
+
+from data.qrs_detection import detect_qrs_biosppy
+from utils.preprocessing import create_label_map, standarize_signal,normalize_signal
 from config import NUM_SAMPLES  # Importujemy stałą
+from utils.visualization import visualize_interpolation
+from scipy.signal import resample
 
 
 
@@ -20,33 +24,50 @@ def load_ecg_record(record_name, directory="data/raw/mitdb/"):
     return record.p_signal, annotation.sample, annotation.symbol, record.fs
 
 
-def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples):
+
+def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples=NUM_SAMPLES):
     """
-    Interpoluje segment EKG do stałej liczby próbek, zachowując dokładne położenie adnotacji.
+    Interpoluje segment EKG do stałej liczby próbek, używając cubic splines,
+    jednocześnie zachowując dokładne położenie adnotacji.
+
+    :param segment: Oryginalny fragment sygnału EKG (numpy array)
+    :param annotations: Lista adnotacji w oryginalnym segmencie (lista indeksów)
+    :param segment_start: Indeks początku segmentu w oryginalnym sygnale
+    :param segment_end: Indeks końca segmentu w oryginalnym sygnale
+    :param num_samples: Docelowa liczba próbek w segmencie
+    :return: Interpolowany segment, nowe pozycje adnotacji
     """
     if len(segment) == num_samples:
         return segment, np.array(annotations, dtype=int)
 
-    # Interpolacja sygnału
-    x_old = np.linspace(0, len(segment) - 1, len(segment))
-    x_new = np.linspace(0, len(segment) - 1, num_samples)
-    interpolator = interp1d(x_old, segment, kind='linear', fill_value="extrapolate")
-    segment_resized = interpolator(x_new)
+    # **Interpolacja sygnału cubic splines**
+    x_old = np.linspace(0, 1, len(segment))  # Oryginalna siatka czasowa
+    x_new = np.linspace(0, 1, num_samples)  # Nowa siatka czasowa
+    spline = CubicSpline(x_old, segment, extrapolate=True)
+    segment_resized = spline(x_new)
 
-    # Przeskalowanie adnotacji BEZ normalizacji!
+    # **Skalowanie adnotacji do nowej długości**
     scale_factor = num_samples / len(segment)
-    new_annotations = [(ann - segment_start) * scale_factor for ann in annotations if segment_start <= ann < segment_end]
-    new_annotations = np.clip(np.round(new_annotations).astype(int), 0, num_samples - 1)
+    new_annotations = [
+        round((ann - segment_start) * scale_factor) for ann in annotations
+        if segment_start <= ann < segment_end
+    ]
 
-    return segment_resized, new_annotations
+    # **Zabezpieczenie przed błędami indeksowania**
+    new_annotations = np.clip(new_annotations, 0, num_samples - 1)
+
+    # 🟢 Wizualizacja (jeśli chcesz zobaczyć efekt interpolacji)
+    #visualize_interpolation(segment_resized, new_annotations)
+
+    return segment_resized, np.array(new_annotations, dtype=int)
 
 
-def detect_qrs(signal, fs):
-    """
-    Wykrywa zespoły QRS jako punkty odniesienia do segmentacji cykli serca.
-    """
-    peaks, _ = find_peaks(signal, height=0.5, distance=fs * 0.6)  # Minimalny odstęp 600ms
-    return peaks
+
+
+
+
+
+
 
 
 def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples=NUM_SAMPLES):
@@ -101,6 +122,7 @@ def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
     all_segments, all_labels = [], []
     files = [f.split('.')[0] for f in os.listdir(directory) if f.endswith('.dat')]
 
+
     for record_name in files:
         record_path = os.path.join(directory, record_name)
         record = wfdb.rdrecord(record_path)
@@ -109,11 +131,19 @@ def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
 
         signal = standarize_signal(record.p_signal[:, 0])
         annotations, labels = annotation.sample, annotation.symbol
-        qrs_peaks = detect_qrs(signal, record.fs)
+        qrs_peaks = detect_qrs_biosppy(signal, record.fs)
         X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples)
 
         all_segments.append(X)
         all_labels.append(y)
 
     return np.concatenate(all_segments), np.concatenate(all_labels)
+
+
+ICENTIA_TO_MIT_BIH = {
+    "N": "N",   # Normalne pobudzenie → Normalne pobudzenie
+    "S": "A",   # ESSV (PAC) → Pobudzenie przedsionkowe (Atrial)
+    "V": "V",   # PVC → PVC (Przedwczesne pobudzenie komorowe)
+    "Q": "Q",   # Nieznane pobudzenie → Nieznane pobudzenie
+}
 

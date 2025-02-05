@@ -21,24 +21,22 @@ def main():
 
     print("Urządzenie domyślne dla obliczeń:", tf.test.gpu_device_name())
     print(device_lib.list_local_devices())
+    print()
 
 
     # Przykłady użycia:
     # 1. Podziel 'MLII' na 60 oddzielnych wykresów (każdy w osobnym oknie)
-    #plot_ecg_record('data/raw/mitdb/100', selected_channel='MLII')
+    #plot_ecg_record('data/raw/mitdb/106', selected_channel='MLII' , segment_duration=1)
 
-
-
-
-
-
-
-
+    #annotation = wfdb.rdann('106', 'atr', pn_dir='mitdb')  # Wczytanie anotacji
+    #print(annotation.symbol)  # Typ zdarzenia (np. 'N' dla normalnych uderzeń)
 
 
     # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
     X, y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES)
+
+
 
     # **2️⃣ Sprawdzenie liczby próbek w każdej klasie**
     unique_classes, class_counts = np.unique(y, return_counts=True)
@@ -49,7 +47,7 @@ def main():
         print(f"Klasa {cls}: {count} próbek")
 
     # **3️⃣ Usuwanie klas z mniej niż 2 próbkami**
-    valid_classes = [cls for cls, count in class_counts_dict.items() if count >= 2]
+    valid_classes = [cls for cls, count in class_counts_dict.items() if count >= 20]
 
     # Tworzenie nowej mapy etykiet dla pozostałych klas
     label_map = {cls: i for i, cls in enumerate(valid_classes)}
