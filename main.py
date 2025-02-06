@@ -34,7 +34,7 @@ def main():
 
     # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
-    X, y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES)
+    X, y = prepare_qrs_dataset()
 
 
 
