@@ -4,13 +4,11 @@ import pickle
 import numpy as np
 import wfdb
 from scipy.interpolate import interp1d, CubicSpline
-from scipy.signal import find_peaks
 from sklearn.preprocessing import MultiLabelBinarizer
 from data.qrs_detection import detect_qrs_biosppy
 from utils.preprocessing import *
 from config import NUM_SAMPLES  # Importujemy stałą
 from utils.visualization import visualize_interpolation
-from scipy.signal import resample
 
 
 def load_ecg_record(record_name, directory="data/raw/mitdb/"):

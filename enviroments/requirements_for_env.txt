@@ -17,8 +17,6 @@ pip install jupyter jupyter_http_over_ws
 
 
 
-
-
 conda create --name conda_ekg python=3.10 -y
 conda activate conda_ekg
 conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0 -y
@@ -29,9 +27,9 @@ pip install wfdb scikit-learn matplotlib scipy
 pip install jupyter jupyter_http_over_ws
 
 
-!pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy
+!pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy biosppy
 !git clone https://FBI223:TOKEN_KEY@github.com/FBI223/EKG_PROJEKT.git
 %cd /content/EKG_PROJEKT
 !git pull origin master
-!python /content/EKG_PROJEKT/main.py-
+!python /content/EKG_PROJEKT/main.py
 
