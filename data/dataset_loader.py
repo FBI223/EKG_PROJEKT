@@ -1,6 +1,4 @@
 import os
-import pickle
-
 import numpy as np
 import wfdb
 from scipy.interpolate import interp1d, CubicSpline
@@ -130,9 +128,6 @@ def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
     all_labels = mlb.fit_transform(all_labels)
 
 
-    # **Zapisywanie MultiLabelBinarizer do pliku**
-    with open("models/mlb.pkl", "wb") as f:
-        pickle.dump(mlb, f)
 
     return np.array(all_segments), np.array(all_labels)
 

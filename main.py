@@ -108,26 +108,5 @@ def main():
 
 
 
-
-
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="100")
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="101")
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="102")
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="103")
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="104")
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="105")
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="106")
-    # **💉 Testowanie na nowym pacjencie**
-    test_model_on_patient(model, patient_record="107")
-
-
-
 if __name__ == "__main__":
     main()
