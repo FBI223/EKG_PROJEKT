@@ -18,6 +18,8 @@ def main():
 
     print("✅ Urządzenie domyślne dla obliczeń:", tf.test.gpu_device_name())
     print(device_lib.list_local_devices())
+    print("GPU dostępne:", tf.config.list_physical_devices('GPU'))
+    print()
 
     # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")

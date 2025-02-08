@@ -1,12 +1,17 @@
-# tensorflow
-# numpy
-# wfdb
-# scikit-learn
-# matplotlib
-# scipy
-# cudatoolkit
 
-python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+
+conda create --name ekg_gpu python=3.10 -y
+conda activate ekg_gpu
+conda config --add channels conda-forge
+conda config --add channels rapidsai
+conda config --add channels nvidia
+conda config --add channels defaults
+conda config --show channels
+conda install -c rapidsai -c nvidia -c conda-forge -c defaults cudf=23.06 python=3.10 cudatoolkit=11.8 dask-cudf -y
+pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy biosppy
+conda install -c conda-forge -c nvidia cuda-python=11.8 cupy=12.0 -y
+
+
 
 
 conda create --name ekg_gpu python=3.10 -y

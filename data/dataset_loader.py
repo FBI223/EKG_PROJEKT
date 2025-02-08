@@ -6,6 +6,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from data.qrs_detection import detect_qrs_biosppy
 from utils.preprocessing import *
 from config import NUM_SAMPLES  # Importujemy stałą
+import cudf
 from utils.visualization import visualize_interpolation
 
 
@@ -106,30 +107,23 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples):
     return np.array(segments), segment_labels  # 🔵 segment_labels to teraz lista list!
 
 
+
 def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
-    """
-    Wczytuje pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN.
-    Obsługuje multi-label classification.
-    """
-    all_segments, all_labels = [], []
+    """Przygotowanie datasetu na GPU"""
     files = [f.split('.')[0] for f in os.listdir(directory) if f.endswith('.dat')]
 
-    for record_name in files:
-        signal, annotations, labels, fs = load_ecg_record(record_name, directory)
-        signal = standarize_signal(signal[:, 0])  # Pobranie pierwszego kanału (ECG Lead I)
-        qrs_peaks = detect_qrs_biosppy(signal, fs)
+    with Pool(processes=8) as pool:
+        results = pool.map(process_record, files)
 
-        X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples)
-        all_segments.extend(X)  # ✅ Spłaszczenie segmentów
-        all_labels.extend(y)  # ✅ Lista multi-label
+    df_segments = cudf.DataFrame(np.concatenate([r[0] for r in results]))
+    df_labels = cudf.DataFrame(np.concatenate([r[1] for r in results]))
 
-    # **Konwersja etykiet do MultiLabelBinarizer**
     mlb = MultiLabelBinarizer()
-    all_labels = mlb.fit_transform(all_labels)
+    df_labels = cudf.DataFrame(mlb.fit_transform(df_labels.to_pandas()))
 
 
+    return df_segments.to_pandas().values, df_labels.to_pandas().values
 
-    return np.array(all_segments), np.array(all_labels)
 
 
 
