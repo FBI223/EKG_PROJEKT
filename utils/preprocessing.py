@@ -4,6 +4,8 @@ from scipy.interpolate import interp1d
 from scipy.signal import medfilt
 import numpy as np
 from config import NUM_SAMPLES
+from scipy.signal import medfilt, butter, filtfilt
+
 
 
 # **Funkcje przetwarzania sygnału**

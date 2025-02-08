@@ -1,5 +1,4 @@
 import biosppy
-import heartpy as hp
 import numpy as np
 from scipy.signal import find_peaks
 import scipy.signal as signal
@@ -10,17 +9,6 @@ def detect_qrs_biosppy(ecg_signal, fs):
     """
     out = biosppy.signals.ecg.ecg(ecg_signal, sampling_rate=fs, show=False)
     return out[2]  # Indeksy wykrytych zespołów QRS
-
-
-
-
-def detect_qrs_heartpy(ecg_signal, fs):
-    """
-    Wykrywa zespoły QRS za pomocą HeartPy.
-    """
-    wd, _ = hp.process(ecg_signal, fs)
-    return wd['peaklist']  # Indeksy QRS
-
 
 
 

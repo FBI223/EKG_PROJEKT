@@ -3,6 +3,9 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/data/raw/icentia11k" />
+      <excludeFolder url="file://$MODULE_DIR$/data/raw/shaoxing" />
+      <excludeFolder url="file://$MODULE_DIR$/testing" />
     </content>
     <orderEntry type="jdk" jdkName="conda_ekg" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
