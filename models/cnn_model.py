@@ -4,12 +4,16 @@ from tensorflow.keras.metrics import AUC, Precision, Recall
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout, BatchNormalization
 
-# ✅ F1-score jako funkcja kompatybilna z Keras
 def f1_score(y_true, y_pred):
     """Oblicza F1-score jako średnią harmoniczną precision i recall"""
+    y_true = K.cast(y_true, 'float32')  # Rzutowanie y_true na float32
+    y_pred = K.cast(y_pred, 'float32')  # Rzutowanie y_pred na float32
+
     precision = K.sum(K.round(K.clip(y_true * y_pred, 0, 1))) / (K.sum(K.round(K.clip(y_pred, 0, 1))) + K.epsilon())
     recall = K.sum(K.round(K.clip(y_true * y_pred, 0, 1))) / (K.sum(K.round(K.clip(y_true, 0, 1))) + K.epsilon())
+
     return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
+
 
 def build_cnn_multilabel(input_shape, num_classes):
     model = Sequential([
