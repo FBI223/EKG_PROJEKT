@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/data/raw/shaoxing" />
       <excludeFolder url="file://$MODULE_DIR$/testing" />
     </content>
-    <orderEntry type="jdk" jdkName="conda_ekg" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="ekg_gpu" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
