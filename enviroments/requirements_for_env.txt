@@ -1,5 +1,13 @@
 
 
+
+1) WSL
+
+
+sudo apt update
+sudo apt upgrade -y
+sudo apt install nvidia-cuda-toolkit -y
+
 conda create --name ekg_gpu python=3.10 -y
 conda activate ekg_gpu
 conda config --add channels conda-forge
@@ -14,12 +22,9 @@ conda install -c conda-forge -c nvidia cuda-python=11.8 cupy=12.0 -y
 
 
 
-conda create --name ekg_gpu python=3.10 -y
-conda activate ekg_gpu
-conda install -c conda-forge cudatoolkit=11.8 tensorflow -y
-pip install numpy wfdb scikit-learn matplotlib scipy
-pip install jupyter jupyter_http_over_ws
 
+
+2) WINDOWS
 
 
 conda create --name conda_ekg python=3.10 -y
@@ -32,7 +37,11 @@ pip install wfdb scikit-learn matplotlib scipy
 pip install jupyter jupyter_http_over_ws
 
 
-!pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy biosppy
+
+
+3) GOOGLE COLAB
+
+!pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy biosppy cudf
 !git clone https://FBI223:TOKEN_KEY@github.com/FBI223/EKG_PROJEKT.git
 %cd /content/EKG_PROJEKT
 !git pull origin master

@@ -1,4 +1,7 @@
 import os
+from multiprocessing import Pool
+
+import cudf
 import numpy as np
 import wfdb
 from scipy.interpolate import interp1d, CubicSpline
@@ -106,29 +109,38 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples):
     return np.array(segments), segment_labels  # 🔵 segment_labels to teraz lista list!
 
 
+def process_record(record_name):
+    """Przetwarzanie jednego rekordu (równolegle na CPU)"""
+    signal, annotations, labels, fs = load_ecg_record(record_name)
+    signal = standarize_signal(signal[:, 0])  # Pobranie pierwszego kanału (ECG Lead I)
+    qrs_peaks = detect_qrs_biosppy(signal, fs)
+
+    X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, NUM_SAMPLES)
+
+    return X, y  # ✅ Nie konwertujemy jeszcze na CUDF tutaj!
+
 def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
-    """
-    Wczytuje pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN.
-    Obsługuje multi-label classification.
-    """
-    all_segments, all_labels = [], []
+    """Przygotowanie datasetu na GPU"""
     files = [f.split('.')[0] for f in os.listdir(directory) if f.endswith('.dat')]
 
-    for record_name in files:
-        signal, annotations, labels, fs = load_ecg_record(record_name, directory)
-        signal = standarize_signal(signal[:, 0])  # Pobranie pierwszego kanału (ECG Lead I)
-        qrs_peaks = detect_qrs_biosppy(signal, fs)
+    # Użycie multiprocessing do przyspieszenia przetwarzania na CPU
+    with Pool(processes=8) as pool:
+        results = pool.map(process_record, files)
 
-        X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples)
-        all_segments.extend(X)  # ✅ Spłaszczenie segmentów
-        all_labels.extend(y)  # ✅ Lista multi-label
+    # ✅ Zamiana listy numpy na CUDF na GPU
+    df_segments = cudf.DataFrame(np.concatenate([r[0] for r in results]))
+    df_labels = cudf.DataFrame(np.concatenate([r[1] for r in results]))
 
-    # **Konwersja etykiet do MultiLabelBinarizer**
+    # ⚠️ `MultiLabelBinarizer` działa tylko z `pandas`, więc konwertujemy dane
     mlb = MultiLabelBinarizer()
-    all_labels = mlb.fit_transform(all_labels)
+    df_labels_pandas = df_labels.to_pandas()  # ⬅️ Zamiana `cudf` → `pandas`
+    df_labels_pandas = mlb.fit_transform(df_labels_pandas)
 
-    return np.array(all_segments), np.array(all_labels)
+    # ✅ Zamiana wyników `pandas` na `cudf` z powrotem
+    df_labels = cudf.DataFrame(df_labels_pandas)
 
+
+    return df_segments.to_pandas().values, df_labels.to_pandas().values  # ✅ Konwersja do
 
 
 
