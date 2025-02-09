@@ -1,11 +1,11 @@
-import os
-import numpy as np
-import wfdb
+
+import pickle
 from scipy.interpolate import interp1d, CubicSpline
 from sklearn.preprocessing import MultiLabelBinarizer
+from data.process_data import save_processed_data, load_processed_data
 from data.qrs_detection import detect_qrs_biosppy
 from utils.preprocessing import *
-from config import NUM_SAMPLES  # Importujemy stałą
+from config import * # Importujemy stałą
 from utils.visualization import visualize_interpolation
 
 
@@ -38,7 +38,8 @@ def interpolate_segment(segment, annotations, segment_start, segment_end, num_sa
     # Interpolacja sygnału za pomocą `CubicSpline`
     x_old = np.linspace(0, 1, len(segment))  # Oryginalna siatka czasowa
     x_new = np.linspace(0, 1, num_samples)  # Nowa siatka czasowa
-    spline = CubicSpline(x_old, segment, extrapolate=True)
+    spline = interp1d(x_old, segment, kind="linear", fill_value="extrapolate")
+    #spline = CubicSpline(x_old, segment, extrapolate=True)
     segment_resized = spline(x_new)
 
     # Dodanie szumów medycznych po interpolacji
@@ -55,8 +56,8 @@ def interpolate_segment(segment, annotations, segment_start, segment_end, num_sa
     new_annotations = np.clip(new_annotations, 0, num_samples - 1)
 
     #visualize_interpolation(segment_noisy, new_annotations)
-
     return segment_noisy, np.array(new_annotations, dtype=int)
+
 
 def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples):
     """
@@ -72,7 +73,7 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples):
     segments = []
     segment_labels = []
 
-    label_map = create_label_map("data/raw/mitdb/")
+
 
     for i in range(len(qrs_peaks) - 1):
         start = qrs_peaks[i]
@@ -83,7 +84,7 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples):
         # Pobranie adnotacji w segmencie
         segment_events = [
             (ann, label) for ann, label in zip(annotations, labels)
-            if start <= ann < end and label in label_map
+            if start <= ann < end and label in LABEL_MAP
         ]
 
         # 🔵 Prawidłowe wywołanie `interpolate_segment()`
@@ -93,9 +94,9 @@ def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples):
 
         # 🔵 MULTI-LABEL: Zachowujemy wszystkie klasy zamiast tylko jednej
         if segment_events:
-            segment_label = list(set(label_map[label] for _, label in segment_events))
+            segment_label = list(set(LABEL_MAP[label] for _, label in segment_events))
         else:
-            segment_label = [label_map['N']]  # Jeśli brak etykiet, przypisujemy normalny rytm
+            segment_label = [LABEL_MAP['N']]  # Jeśli brak etykiet, przypisujemy normalny rytm
 
         segments.append(segment_resized)
         segment_labels.append(segment_label)
@@ -111,50 +112,42 @@ def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
     Wczytuje pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN.
     Obsługuje multi-label classification.
     """
+    filename = "ekg_segments"
+
+    '''
+    # **1️⃣ Sprawdzenie czy przetworzone dane już istnieją**
+    X_loaded, Y_loaded, mlb = load_processed_data(filename)
+    if X_loaded is not None and Y_loaded is not None:
+        return X_loaded, Y_loaded
+    '''
+
+    print("📥 Przetwarzanie danych od zera...")
+
     all_segments, all_labels = [], []
     files = [f.split('.')[0] for f in os.listdir(directory) if f.endswith('.dat')]
 
     for record_name in files:
         signal, annotations, labels, fs = load_ecg_record(record_name, directory)
-        signal = standarize_signal(signal[:, 0])  # Pobranie pierwszego kanału (ECG Lead I)
+        signal = standarize_signal(signal[:, 0])
         qrs_peaks = detect_qrs_biosppy(signal, fs)
 
         X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples)
-        all_segments.extend(X)  # ✅ Spłaszczenie segmentów
-        all_labels.extend(y)  # ✅ Lista multi-label
+        all_segments.extend(X)
+        all_labels.extend(y)
 
-    # **Konwersja etykiet do MultiLabelBinarizer**
+    # **2️⃣ Konwersja etykiet do MultiLabelBinarizer**
     mlb = MultiLabelBinarizer()
     all_labels = mlb.fit_transform(all_labels)
 
+    # **3️⃣ Zapis `MultiLabelBinarizer`**
+    with open("models/mlb.pkl", "wb") as f:
+        pickle.dump(mlb, f)
+    print("✅ MultiLabelBinarizer zapisany: models/mlb.pkl")
+
+    # **4️⃣ Zapisanie przetworzonych danych**
+    save_processed_data(np.array(all_segments), np.array(all_labels), filename)
+
     return np.array(all_segments), np.array(all_labels)
-
-
-
-
-
-def add_medical_noise(signal, noise_level=0.01, noise_type="impulse"):
-    """
-    Dodaje szum medyczny do sygnału EKG.
-
-    :param signal: Oryginalny sygnał EKG (numpy array)
-    :param noise_level: Poziom szumu (procent wartości maksymalnej sygnału)
-    :param noise_type: Typ szumu: "gaussian", "impulse", "pink"
-    :return: Sygnał EKG z dodanym szumem
-    """
-    if noise_type == "gaussian":
-        noise = np.random.normal(0, noise_level * np.max(signal), size=signal.shape)
-    elif noise_type == "impulse":
-        noise = np.random.choice([0, np.max(signal) * noise_level], size=signal.shape, p=[0.98, 0.02])
-    elif noise_type == "pink":
-        freqs = np.fft.rfftfreq(len(signal))
-        pink_noise = np.random.randn(len(freqs)) / (freqs + 1e-4)
-        noise = np.fft.irfft(pink_noise) * noise_level * np.max(signal)
-    else:
-        raise ValueError("Nieznany typ szumu!")
-
-    signal_noisy = signal + noise
-    return np.clip(signal_noisy, np.min(signal), np.max(signal))  # 🔵 Zapobiegamy wartościom ekstremalnym
 
 
 

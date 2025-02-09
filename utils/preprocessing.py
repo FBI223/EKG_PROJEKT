@@ -1,10 +1,34 @@
 import os
 import wfdb
-from scipy.interpolate import interp1d
-from scipy.signal import medfilt
 import numpy as np
-from config import NUM_SAMPLES
-from scipy.signal import medfilt, butter, filtfilt
+
+
+
+def add_medical_noise(signal, noise_level=0.01, noise_type="impulse"):
+    """
+    Dodaje szum medyczny do sygnału EKG.
+
+    :param signal: Oryginalny sygnał EKG (numpy array)
+    :param noise_level: Poziom szumu (procent wartości maksymalnej sygnału)
+    :param noise_type: Typ szumu: "gaussian", "impulse", "pink"
+    :return: Sygnał EKG z dodanym szumem
+    """
+    if noise_type == "gaussian":
+        noise = np.random.normal(0, noise_level * np.max(signal), size=signal.shape)
+    elif noise_type == "impulse":
+        noise = np.random.choice([0, np.max(signal) * noise_level], size=signal.shape, p=[0.98, 0.02])
+    elif noise_type == "pink":
+        freqs = np.fft.rfftfreq(len(signal))
+        pink_noise = np.random.randn(len(freqs)) / (freqs + 1e-4)
+        noise = np.fft.irfft(pink_noise) * noise_level * np.max(signal)
+    else:
+        raise ValueError("Nieznany typ szumu!")
+
+    signal_noisy = signal + noise
+    return np.clip(signal_noisy, np.min(signal), np.max(signal))  # 🔵 Zapobiegamy wartościom ekstremalnym
+
+
+
 
 
 
@@ -22,6 +46,22 @@ def normalize_signal(ecg_signal):
     return (ecg_signal - min_val) / (max_val - min_val) if max_val != min_val else ecg_signal
 
 
+def filter_rare_classes(X, Y, min_samples=5):
+    """Usuwa klasy, które mają mniej niż `min_samples` próbek."""
+    class_counts = np.sum(Y, axis=0)
+    valid_classes = np.where(class_counts >= min_samples)[0]
+
+    print(f"📊 Liczba próbek w każdej klasie przed filtracją: {class_counts}")
+    print(f"🎯 Klasy po filtracji: {valid_classes}")
+
+    # Tworzenie maski dla segmentów zawierających przynajmniej jedną ważną klasę
+    mask = np.any(Y[:, valid_classes] == 1, axis=1)
+
+    X_filtered = X[mask]
+    Y_filtered = Y[mask][:, valid_classes]  # Usunięcie rzadkich klas
+
+    print(f"✅ Po filtracji: X.shape={X_filtered.shape}, Y.shape={Y_filtered.shape}")
+    return X_filtered, Y_filtered
 
 
 
@@ -54,10 +94,3 @@ def extract_unique_annotations(directory="data/raw/mitdb/"):
 
 
 
-def create_label_map(directory="data/raw/mitdb/"):
-    """
-    Tworzy dynamiczną mapę etykiet dla adnotacji EKG.
-    """
-    annotations = extract_unique_annotations(directory)
-    sorted_labels = sorted(annotations.keys())  # Sortujemy etykiety
-    return {label: idx for idx, label in enumerate(sorted_labels)}

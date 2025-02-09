@@ -1,4 +1,0 @@
-100.dat	Surowy sygnał EKG (binary)
-100.hea	Nagłówek (parametry zapisu)
-100.atr	Adnotacje lekarza (np. arytmie)
-100.xws	Dodatkowe metadane

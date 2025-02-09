@@ -24,6 +24,9 @@ pip install wfdb scikit-learn matplotlib scipy
 pip install jupyter jupyter_http_over_ws
 
 
+conda install -c conda-forge imbalanced-learn
+
+
 
 
 3) GOOGLE COLAB
