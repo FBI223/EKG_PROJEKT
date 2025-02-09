@@ -1,7 +1,7 @@
 # config.py - tutaj przechowujemy stałe globalne
 NUM_SAMPLES = 300  # Stała liczba próbek
 FS = 360  # Częstotliwość próbkowania MIT-BIH
-MIN_SAMPLES_FOR_MODEL=5
+MIN_SAMPLES_FOR_MODEL=10
 MITDB_PATH="data/raw/mitdb/"
 ICENTIA11K_PATH="data/raw/mitdb/"
 SHAOXING_PATH="data/raw/mitdb/"
@@ -32,3 +32,16 @@ LABEL_MAP = {
     '~': 21,   # Noise (Szum)
     '?': 22    # Unidentified (Niezidentyfikowane zdarzenie)
 }
+
+# Definiujemy hierarchię priorytetów
+CLASS_PRIORITY = [
+    [9, 10, 11, 7, 8],     # Poważne zaburzenia rytmu
+    [1, 2],                # Bloki odnóg pęczka Hisa
+    [3, 4, 6, 5],          # Pobudzenia nadkomorowe
+    [12, 13, 14],          # Pobudzenia ucieczkowe
+    [18, 17, 20, 19],      # Artefakty i nieokreślone pobudzenia
+    [15, 16],              # Pobudzenia stymulatorowe
+    [0],                   # Normalny rytm zatokowy
+    [22, 21]               # Szum i niezidentyfikowane zdarzenia
+]
+

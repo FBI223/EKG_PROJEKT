@@ -2,6 +2,19 @@ import os
 import wfdb
 import numpy as np
 
+from config import CLASS_PRIORITY
+
+
+# Funkcja wyboru najwyższej klasy według priorytetu
+def select_highest_priority_class(segment_labels):
+    """
+    Wybiera klasę o najwyższym priorytecie spośród `segment_labels`.
+    """
+    for priority_group in CLASS_PRIORITY:
+        for label in priority_group:
+            if label in segment_labels:
+                return label  # Zwracamy pierwszą klasę z najwyższym priorytetem
+    return 0  # Domyślnie zwracamy `0` (Normalny rytm)
 
 
 def add_medical_noise(signal, noise_level=0.01, noise_type="impulse"):

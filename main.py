@@ -24,7 +24,8 @@ def train_model():
 
     # **1️⃣ Wczytanie danych**
     print("📥 Wczytywanie i segmentacja EKG...")
-    X, Y = prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES)
+    X, Y = prepare_qrs_dataset(directory=MITDB_PATH)
+
 
     # **2️⃣ Usuwanie rzadkich klas**
     X, Y = filter_rare_classes(X, Y, min_samples=MIN_SAMPLES_FOR_MODEL)
@@ -125,4 +126,5 @@ def test_model_on_mitdb():
         test_model_on_patient(model, patient_record=patient)
 
 if __name__ == "__main__":
-    train_model()  # 🚀 Trening modelu
+    #train_model()  # 🚀 Trening modelu
+    test_model_on_mitdb()
