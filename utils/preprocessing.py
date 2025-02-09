@@ -45,20 +45,26 @@ def normalize_signal(ecg_signal):
     max_val = np.max(ecg_signal)
     return (ecg_signal - min_val) / (max_val - min_val) if max_val != min_val else ecg_signal
 
-
 def filter_rare_classes(X, Y, min_samples=5):
     """Usuwa klasy, które mają mniej niż `min_samples` próbek."""
-    class_counts = np.sum(Y, axis=0)
-    valid_classes = np.where(class_counts >= min_samples)[0]
+    unique, counts = np.unique(Y, return_counts=True)
+    class_counts = dict(zip(unique, counts))  # Liczba wystąpień każdej klasy
+
+    # Klasy, które mają co najmniej `min_samples`
+    valid_classes = [cls for cls, count in class_counts.items() if count >= min_samples]
 
     print(f"📊 Liczba próbek w każdej klasie przed filtracją: {class_counts}")
     print(f"🎯 Klasy po filtracji: {valid_classes}")
 
+    # Jeśli po filtracji nie zostały żadne klasy → rzuć błąd
+    if not valid_classes:
+        raise ValueError("❌ Wszystkie klasy zostały odrzucone przez filtrację! Zmniejsz `min_samples`.")
+
     # Tworzenie maski dla segmentów zawierających przynajmniej jedną ważną klasę
-    mask = np.any(Y[:, valid_classes] == 1, axis=1)
+    mask = np.isin(Y, valid_classes)
 
     X_filtered = X[mask]
-    Y_filtered = Y[mask][:, valid_classes]  # Usunięcie rzadkich klas
+    Y_filtered = Y[mask]  # Nie trzeba indeksować drugiego wymiaru, bo `Y` jest 1D
 
     print(f"✅ Po filtracji: X.shape={X_filtered.shape}, Y.shape={Y_filtered.shape}")
     return X_filtered, Y_filtered

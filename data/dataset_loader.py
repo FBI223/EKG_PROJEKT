@@ -1,125 +1,102 @@
-
+import numpy as np
+import os
 import pickle
-from scipy.interpolate import interp1d, CubicSpline
-from sklearn.preprocessing import MultiLabelBinarizer
+import wfdb
+from scipy.interpolate import interp1d
 from data.process_data import save_processed_data, load_processed_data
 from data.qrs_detection import detect_qrs_biosppy
-from utils.preprocessing import *
-from config import * # Importujemy stałą
+from utils.preprocessing import standarize_signal, add_medical_noise
+from config import LABEL_MAP, NUM_SAMPLES
 from utils.visualization import visualize_interpolation
 
 
 def load_ecg_record(record_name, directory="data/raw/mitdb/"):
-    """
-    Wczytuje EKG i adnotacje z MIT-BIH.
-    """
+    """Wczytuje EKG i adnotacje z MIT-BIH."""
     record_path = os.path.join(directory, record_name)
     record = wfdb.rdrecord(record_path)
-    annotation = wfdb.rdann(record_path, 'atr')  # Pobranie adnotacji
+    annotation = wfdb.rdann(record_path, 'atr')
 
+    print(f"✅ Wczytano {record_name}: sygnał={record.p_signal.shape}, adnotacje={len(annotation.sample)}")
     return record.p_signal, annotation.sample, annotation.symbol, record.fs
 
-
 def interpolate_segment(segment, annotations, segment_start, segment_end, num_samples):
-    """
-    Interpoluje segment EKG do stałej liczby próbek za pomocą `CubicSpline`,
-    a następnie dodaje szum medyczny.
-
-    :param segment: Oryginalny fragment sygnału EKG (numpy array)
-    :param annotations: Lista adnotacji w oryginalnym segmencie (lista indeksów)
-    :param segment_start: Indeks początku segmentu w oryginalnym sygnale
-    :param segment_end: Indeks końca segmentu w oryginalnym sygnale
-    :param num_samples: Docelowa liczba próbek w segmencie
-    :return: Interpolowany segment z dodanym szumem, nowe pozycje adnotacji
-    """
-    if len(segment) == num_samples:
-        return segment, np.array(annotations, dtype=int)
-
-    # Interpolacja sygnału za pomocą `CubicSpline`
-    x_old = np.linspace(0, 1, len(segment))  # Oryginalna siatka czasowa
-    x_new = np.linspace(0, 1, num_samples)  # Nowa siatka czasowa
+    """Interpoluje segment EKG do stałej liczby próbek."""
+    x_old = np.linspace(0, 1, len(segment))
+    x_new = np.linspace(0, 1, num_samples)
     spline = interp1d(x_old, segment, kind="linear", fill_value="extrapolate")
-    #spline = CubicSpline(x_old, segment, extrapolate=True)
     segment_resized = spline(x_new)
 
-    # Dodanie szumów medycznych po interpolacji
     segment_noisy = add_medical_noise(segment_resized)
 
-    # Skalowanie adnotacji do nowej długości
     scale_factor = num_samples / len(segment)
     new_annotations = [
         round((ann - segment_start) * scale_factor) for ann in annotations
         if segment_start <= ann < segment_end
     ]
-
-    # Zabezpieczenie przed błędami indeksowania
     new_annotations = np.clip(new_annotations, 0, num_samples - 1)
 
-    #visualize_interpolation(segment_noisy, new_annotations)
+
     return segment_noisy, np.array(new_annotations, dtype=int)
 
 
 def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks, num_samples):
     """
-    Segmentuje EKG na podstawie QRS → QRS i przeskalowuje do stałej długości.
-
-    :param signal: Sygnał EKG
-    :param annotations: Pozycje oznaczeń
-    :param labels: Symbole oznaczeń
-    :param qrs_peaks: Pozycje załamków QRS
-    :param num_samples: Docelowa liczba próbek w każdym cyklu (stała długość)
-    :return: Tablica segmentów, etykiety jako lista indeksów klas (multi-label)
+    Segmentuje EKG na podstawie QRS → QRS i przypisuje etykiety.
+    - Interpoluje **tylko jeśli są anomalie**.
+    - Usuwa segmenty z **tylko normalnym rytmem (`0`)**.
     """
     segments = []
     segment_labels = []
 
-
+    print("📊 Rozpoczęcie segmentacji...")
 
     for i in range(len(qrs_peaks) - 1):
-        start = qrs_peaks[i]
-        end = qrs_peaks[i + 1]
-
+        start, end = qrs_peaks[i], qrs_peaks[i + 1]
         segment = signal[start:end]
 
-        # Pobranie adnotacji w segmencie
+        # 🔹 Pobranie etykiet z segmentu
         segment_events = [
             (ann, label) for ann, label in zip(annotations, labels)
             if start <= ann < end and label in LABEL_MAP
         ]
 
-        # 🔵 Prawidłowe wywołanie `interpolate_segment()`
-        segment_resized, new_annotations = interpolate_segment(
-            segment, [ann for ann, _ in segment_events], start, end, num_samples
-        )
-
-        # 🔵 MULTI-LABEL: Zachowujemy wszystkie klasy zamiast tylko jednej
+        # **1️⃣ Sprawdzenie, czy są anomalie**
         if segment_events:
             segment_label = list(set(LABEL_MAP[label] for _, label in segment_events))
+            segment_label = [lbl for lbl in segment_label if lbl != 0]  # Usuń normalny rytm
+
+            if not segment_label:
+                continue  # 🔥 Ignorujemy jeśli nic nie zostało
+
+            # 🔥 Interpolacja tylko jeśli segment zawiera anomalie
+            segment_resized, new_annotations = interpolate_segment(
+                segment, [ann for ann, _ in segment_events], start, end, num_samples
+            )
+
+            # 🔥 Wizualizacja tylko jeśli segment był interpolowany
+            #visualize_interpolation(segment_resized, new_annotations, segment_id=i)
+
         else:
-            segment_label = [LABEL_MAP['N']]  # Jeśli brak etykiet, przypisujemy normalny rytm
+            continue  # 🔥 Ignorujemy segmenty bez anomalii
+
+        # 🔹 Wybór **głównej klasy** (zamiast multi-label)
+        primary_label = segment_label[0]
 
         segments.append(segment_resized)
-        segment_labels.append(segment_label)
+        segment_labels.append(primary_label)
 
-        # ✅ DEBUG: Sprawdź czy segmenty mają właściwe klasy
-        #print(f"🔍 Segment {i}: kształt={segment_resized.shape}, etykieta={segment_label}, nowe adnotacje={new_annotations}")
+        print(f"✅ Segment {i}: kształt={segment_resized.shape}, etykieta={primary_label}, nowe adnotacje={new_annotations}")
 
-    return np.array(segments), segment_labels  # 🔵 segment_labels to teraz lista list!
+    print(f"✅ Segmentacja zakończona: {len(segments)} segmentów (bez normalnych rytmów)")
+    return np.array(segments), np.array(segment_labels)
+
 
 
 def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
     """
     Wczytuje pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN.
-    Obsługuje multi-label classification.
     """
     filename = "ekg_segments"
-
-    '''
-    # **1️⃣ Sprawdzenie czy przetworzone dane już istnieją**
-    X_loaded, Y_loaded, mlb = load_processed_data(filename)
-    if X_loaded is not None and Y_loaded is not None:
-        return X_loaded, Y_loaded
-    '''
 
     print("📥 Przetwarzanie danych od zera...")
 
@@ -135,20 +112,8 @@ def prepare_qrs_dataset(directory="data/raw/mitdb/", num_samples=NUM_SAMPLES):
         all_segments.extend(X)
         all_labels.extend(y)
 
-    # **2️⃣ Konwersja etykiet do MultiLabelBinarizer**
-    mlb = MultiLabelBinarizer()
-    all_labels = mlb.fit_transform(all_labels)
-
-    # **3️⃣ Zapis `MultiLabelBinarizer`**
-    with open("models/mlb.pkl", "wb") as f:
-        pickle.dump(mlb, f)
-    print("✅ MultiLabelBinarizer zapisany: models/mlb.pkl")
-
-    # **4️⃣ Zapisanie przetworzonych danych**
+    # Zapisanie przetworzonych danych
     save_processed_data(np.array(all_segments), np.array(all_labels), filename)
 
+    print(f"✅ Zapisano dane: {len(all_segments)} próbek, {len(set(all_labels))} unikalnych klas")
     return np.array(all_segments), np.array(all_labels)
-
-
-
-

@@ -205,26 +205,37 @@ def plot_full_ecg_record(record_name, signal, annotations, labels, fs=360, start
 
     plt.show()
 
-def visualize_interpolation(signal, annotations=None):
+
+
+
+def visualize_interpolation(signal, annotations=None, segment_id=0):
     """
-    Rysuje interpolowany segment EKG z naniesionymi adnotacjami.
+    Rysuje i zapisuje interpolowany segment EKG z naniesionymi adnotacjami.
 
     :param signal: Interpolowany sygnał EKG (1D numpy array).
     :param annotations: Lista indeksów adnotacji po interpolacji.
+    :param segment_id: Numer segmentu, do nazwy pliku.
     """
+
+    save_folder = "utils/visualization_folder"
+    os.makedirs(save_folder, exist_ok=True)  # 🔥 Tworzy folder jeśli nie istnieje
+
     plt.figure(figsize=(10, 4))
     plt.plot(signal, color="b", linewidth=1, label="Interpolowany sygnał")
 
-    # Dodaj adnotacje jako czerwone kropki na wykresie
+    # 🔹 Adnotacje
     if annotations is not None:
         for ann in annotations:
-            plt.scatter(ann, signal[ann], color='red', marker='o', label="Adnotacja")
+            plt.scatter(ann, signal[ann], color='red', marker='o')
 
     plt.xlabel("Próbki")
     plt.ylabel("Znormalizowana wartość")
-    plt.title("Interpolowany segment EKG z adnotacjami")
+    plt.title(f"Interpolowany segment EKG {segment_id}")
     plt.legend()
-    plt.show()
 
+    # 🔥 Szybszy zapis do pliku
+    save_path = os.path.join(save_folder, f"ekg_segment_{segment_id}.png")
+    plt.savefig(save_path, dpi=100, bbox_inches='tight')
+    plt.close()  # 🔥 Zamyka wykres, oszczędza RAM
 
-
+    print(f"📁 Wykres zapisany: {save_path}")
