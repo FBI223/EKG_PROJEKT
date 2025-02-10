@@ -1,0 +1,1457 @@
+GPU dostępne: [PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
+📥 Wczytywanie i segmentacja EKG...
+📥 Przetwarzanie danych od zera...
+🔍 Liczba próbek przed oversamplingiem: 93779
+🔍 Klasy przed oversamplingiem: {0: 61142, 1: 7660, 2: 6607, 3: 2035, 4: 117, 5: 68, 7: 6563, 8: 733, 9: 6, 10: 131, 12: 12, 13: 215, 14: 102, 15: 6597, 16: 748, 17: 168, 18: 23, 19: 95, 20: 677, 21: 80}
+✅ Dane zapisane: data/processed/ekg_segments.npz
+✅ Zapisano dane: 93779 próbek, 20 unikalnych klas
+📌 Mapa klas: {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 7: 6, 8: 7, 9: 8, 10: 9, 12: 10, 13: 11, 14: 12, 15: 13, 16: 14, 17: 15, 18: 16, 19: 17, 20: 18, 21: 19}
+📊 Liczba próbek po oversamplingu: Counter({0: 61142, 3: 61142, 6: 61142, 17: 61142, 16: 61142, 19: 61142, 13: 61142, 14: 61142, 18: 61142, 7: 61142, 15: 61142, 11: 61142, 1: 61142, 4: 61142, 5: 61142, 2: 61142, 8: 61142, 9: 61142, 12: 61142, 10: 61142})
+📦 Zbiór treningowy: 978272 próbek, Zbiór testowy: 244568 próbek
+🚀 Rozpoczęcie treningu...
+Epoch 1/2
+30571/30571 [==============================] - 272s 9ms/step - loss: 0.2554 - accuracy: 0.9198 - val_loss: 0.0454 - val_accuracy: 0.9856 - lr: 0.0010
+Epoch 2/2
+30571/30571 [==============================] - 267s 9ms/step - loss: 0.0984 - accuracy: 0.9682 - val_loss: 0.0285 - val_accuracy: 0.9911 - lr: 0.0010
+✅ Model zapisany w formatach: .h5, .keras
+✅ Wczytano model z: models/trained_models/v3/cnn_ekg.h5
+123/123 [==============================] - 1s 3ms/step
+✅ y_test_patient shape: (1953, 20), y_pred shape: (1953, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      1919
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.80      1.00      0.89        33
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         1
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      0.99      1.00      1953
+   macro avg       0.09      0.10      0.09      1953
+weighted avg       1.00      0.99      1.00      1953
+ samples avg       0.99      0.99      0.99      1953
+
+117/117 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1865, 20), y_pred shape: (1865, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.99      1.00      1856
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.50      1.00      0.67         3
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         2
+    Klasa 19       0.00      0.00      0.00         4
+
+   micro avg       0.99      0.99      0.99      1865
+   macro avg       0.07      0.10      0.08      1865
+weighted avg       1.00      0.99      0.99      1865
+ samples avg       0.99      0.99      0.99      1865
+
+135/135 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (2151, 20), y_pred shape: (2151, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.92      0.96        75
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         4
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00      2020
+    Klasa 16       0.00      0.00      0.00        52
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.03      0.03      0.03      2151
+   macro avg       0.05      0.05      0.05      2151
+weighted avg       0.03      0.03      0.03      2151
+ samples avg       0.03      0.03      0.03      2151
+
+101/101 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1605, 20), y_pred shape: (1605, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.99      0.99      1603
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.50      1.00      0.67         2
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.99      0.99      0.99      1605
+   macro avg       0.07      0.10      0.08      1605
+weighted avg       1.00      0.99      0.99      1605
+ samples avg       0.99      0.99      0.99      1605
+
+128/128 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (2041, 20), y_pred shape: (2041, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.16      0.28       150
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         2
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00      1336
+    Klasa 16       0.00      0.00      0.00       540
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00        13
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.01      0.01      0.01      2041
+   macro avg       0.05      0.01      0.01      2041
+weighted avg       0.07      0.01      0.02      2041
+ samples avg       0.01      0.01      0.01      2041
+
+156/156 [==============================] - 1s 3ms/step
+✅ y_test_patient shape: (2493, 20), y_pred shape: (2493, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.95      0.98      2425
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        35
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         4
+    Klasa 19       0.00      0.00      0.00        29
+
+   micro avg       0.94      0.93      0.93      2493
+   macro avg       0.05      0.05      0.05      2493
+weighted avg       0.97      0.93      0.95      2493
+ samples avg       0.93      0.93      0.93      2493
+
+97/97 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (1549, 20), y_pred shape: (1549, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.77      0.87      1082
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       467
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.56      0.54      0.55      1549
+   macro avg       0.05      0.04      0.04      1549
+weighted avg       0.70      0.54      0.61      1549
+ samples avg       0.54      0.54      0.54      1549
+
+125/125 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (1995, 20), y_pred shape: (1995, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         0
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        59
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00      1936
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.00      0.00      0.00      1995
+   macro avg       0.00      0.00      0.00      1995
+weighted avg       0.00      0.00      0.00      1995
+ samples avg       0.00      0.00      0.00      1995
+
+90/90 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1435, 20), y_pred shape: (1435, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.96      0.98      1399
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       1.00      1.00      1.00         4
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        17
+     Klasa 8       0.00      0.00      0.00         2
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         1
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         4
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         8
+
+   micro avg       0.95      0.94      0.94      1435
+   macro avg       0.10      0.10      0.10      1435
+weighted avg       0.98      0.94      0.96      1435
+ samples avg       0.94      0.94      0.94      1435
+
+157/157 [==============================] - 1s 5ms/step
+✅ y_test_patient shape: (2502, 20), y_pred shape: (2502, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         0
+     Klasa 1       1.00      1.00      1.00      2462
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        38
+     Klasa 8       0.00      0.00      0.00         2
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.98      0.98      0.98      2502
+   macro avg       0.05      0.05      0.05      2502
+weighted avg       0.98      0.98      0.98      2502
+ samples avg       0.98      0.98      0.98      2502
+
+132/132 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (2112, 20), y_pred shape: (2112, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         1
+     Klasa 1       1.00      1.00      1.00      2110
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         1
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      1.00      1.00      2112
+   macro avg       0.05      0.05      0.05      2112
+weighted avg       1.00      1.00      1.00      2112
+ samples avg       1.00      1.00      1.00      2112
+
+123/123 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1955, 20), y_pred shape: (1955, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      1953
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       1.00      0.50      0.67         2
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      0.99      1.00      1955
+   macro avg       0.10      0.07      0.08      1955
+weighted avg       1.00      0.99      1.00      1955
+ samples avg       0.99      0.99      0.99      1955
+
+91/91 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1448, 20), y_pred shape: (1448, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      1442
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.75      1.00      0.86         6
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      1.00      1.00      1448
+   macro avg       0.09      0.10      0.09      1448
+weighted avg       1.00      1.00      1.00      1448
+ samples avg       1.00      1.00      1.00      1448
+
+109/109 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (1735, 20), y_pred shape: (1735, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.98      0.99      1677
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.64      1.00      0.78         9
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.50      1.00      0.67         2
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        42
+     Klasa 8       0.00      0.00      0.00         4
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         1
+
+   micro avg       0.96      0.95      0.95      1735
+   macro avg       0.11      0.15      0.12      1735
+weighted avg       0.97      0.95      0.96      1735
+ samples avg       0.95      0.95      0.95      1735
+
+122/122 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1951, 20), y_pred shape: (1951, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      1946
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         5
+
+   micro avg       1.00      1.00      1.00      1951
+   macro avg       0.05      0.05      0.05      1951
+weighted avg       1.00      1.00      1.00      1951
+ samples avg       1.00      1.00      1.00      1951
+
+145/145 [==============================] - 1s 4ms/step
+✅ y_test_patient shape: (2306, 20), y_pred shape: (2306, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.98      0.99      2198
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       1.00      1.00      1.00         1
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       107
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.95      0.93      0.94      2306
+   macro avg       0.10      0.10      0.10      2306
+weighted avg       0.95      0.93      0.94      2306
+ samples avg       0.93      0.93      0.93      2306
+
+96/96 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1532, 20), y_pred shape: (1532, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      1531
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.50      1.00      0.67         1
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      1.00      1.00      1532
+   macro avg       0.07      0.10      0.08      1532
+weighted avg       1.00      1.00      1.00      1532
+ samples avg       1.00      1.00      1.00      1532
+
+136/136 [==============================] - 1s 4ms/step
+✅ y_test_patient shape: (2173, 20), y_pred shape: (2173, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         0
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       1.00      1.00      1.00      2073
+     Klasa 3       0.96      0.99      0.98        83
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        16
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         1
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.99      0.99      0.99      2173
+   macro avg       0.10      0.10      0.10      2173
+weighted avg       0.99      0.99      0.99      2173
+ samples avg       0.99      0.99      0.99      2173
+
+97/97 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1550, 20), y_pred shape: (1550, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.75      0.86      1106
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       444
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.53      0.53      0.53      1550
+   macro avg       0.05      0.04      0.04      1550
+weighted avg       0.71      0.53      0.61      1550
+ samples avg       0.53      0.53      0.53      1550
+
+93/93 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1476, 20), y_pred shape: (1476, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.99      1.00      1474
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       1.00      1.00      1.00         1
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         1
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      0.99      0.99      1476
+   macro avg       0.10      0.10      0.10      1476
+weighted avg       1.00      0.99      1.00      1476
+ samples avg       0.99      0.99      0.99      1476
+
+136/136 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (2161, 20), y_pred shape: (2161, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      2159
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         2
+
+   micro avg       1.00      1.00      1.00      2161
+   macro avg       0.05      0.05      0.05      2161
+weighted avg       1.00      1.00      1.00      2161
+ samples avg       1.00      1.00      1.00      2161
+
+95/95 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1505, 20), y_pred shape: (1505, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      1502
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         3
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      1.00      1.00      1505
+   macro avg       0.05      0.05      0.05      1505
+weighted avg       1.00      1.00      1.00      1505
+ samples avg       1.00      1.00      1.00      1505
+
+100/100 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1588, 20), y_pred shape: (1588, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         1
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       1.00      1.00      1.00      1505
+     Klasa 3       1.00      1.00      1.00         2
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.97      1.00      0.98        28
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.33      0.05      0.08        43
+     Klasa 8       0.00      0.00      0.00         4
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         5
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.97      0.96      0.96      1588
+   macro avg       0.16      0.15      0.15      1588
+weighted avg       0.98      0.96      0.97      1588
+ samples avg       0.96      0.96      0.96      1588
+
+120/120 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1916, 20), y_pred shape: (1916, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.99      0.82      0.90      1083
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.45      0.97      0.61        30
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       801
+     Klasa 8       0.00      0.00      0.00         2
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.50      0.48      0.49      1916
+   macro avg       0.07      0.09      0.08      1916
+weighted avg       0.57      0.48      0.52      1916
+ samples avg       0.48      0.48      0.48      1916
+
+102/102 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1625, 20), y_pred shape: (1625, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.78      0.88      1274
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.33      0.92      0.49        26
+     Klasa 4       0.99      1.00      0.99        80
+     Klasa 5       0.50      1.00      0.67         1
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       198
+     Klasa 8       0.00      0.00      0.00         2
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         8
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00        36
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.71      0.68      0.69      1625
+   macro avg       0.14      0.19      0.15      1625
+weighted avg       0.84      0.68      0.75      1625
+ samples avg       0.68      0.68      0.68      1625
+
+104/104 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1659, 20), y_pred shape: (1659, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.94      0.97      1591
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.63      0.88      0.73        33
+     Klasa 4       0.93      1.00      0.96        13
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        19
+     Klasa 8       0.00      0.00      0.00         1
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         2
+
+   micro avg       0.96      0.92      0.94      1659
+   macro avg       0.13      0.14      0.13      1659
+weighted avg       0.98      0.92      0.95      1659
+ samples avg       0.92      0.92      0.92      1659
+
+126/126 [==============================] - 1s 4ms/step
+✅ y_test_patient shape: (2001, 20), y_pred shape: (2001, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.99      0.89      0.94      1684
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       1.00      1.00      1.00         1
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       301
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         1
+    Klasa 19       0.00      0.00      0.00        14
+
+   micro avg       0.78      0.75      0.76      2001
+   macro avg       0.10      0.09      0.10      2001
+weighted avg       0.84      0.75      0.79      2001
+ samples avg       0.75      0.75      0.75      2001
+
+133/133 [==============================] - 1s 4ms/step
+✅ y_test_patient shape: (2124, 20), y_pred shape: (2124, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.99      1.00      2066
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.33      0.50      0.40         2
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        45
+     Klasa 8       0.00      0.00      0.00        10
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         1
+
+   micro avg       0.97      0.97      0.97      2124
+   macro avg       0.07      0.07      0.07      2124
+weighted avg       0.97      0.97      0.97      2124
+ samples avg       0.97      0.97      0.97      2124
+
+118/118 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1883, 20), y_pred shape: (1883, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         3
+     Klasa 1       1.00      1.00      1.00      1427
+     Klasa 2       1.00      0.84      0.91        25
+     Klasa 3       1.00      1.00      1.00        91
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        97
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         6
+    Klasa 10       0.00      0.00      0.00       131
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00       102
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         1
+
+   micro avg       0.82      0.82      0.82      1883
+   macro avg       0.15      0.14      0.15      1883
+weighted avg       0.82      0.82      0.82      1883
+ samples avg       0.82      0.82      0.82      1883
+
+126/126 [==============================] - 1s 4ms/step
+✅ y_test_patient shape: (2001, 20), y_pred shape: (2001, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.99      0.66      0.79       750
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.02      0.01      0.02       929
+     Klasa 8       0.00      0.00      0.00       314
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         2
+    Klasa 19       0.00      0.00      0.00         6
+
+   micro avg       0.25      0.25      0.25      2001
+   macro avg       0.05      0.03      0.04      2001
+weighted avg       0.38      0.25      0.30      2001
+ samples avg       0.25      0.25      0.25      2001
+
+151/151 [==============================] - 1s 3ms/step
+✅ y_test_patient shape: (2401, 20), y_pred shape: (2401, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.96      0.98      2255
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.74      0.92      0.82       138
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         1
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         7
+
+   micro avg       0.96      0.96      0.96      2401
+   macro avg       0.09      0.09      0.09      2401
+weighted avg       0.98      0.96      0.97      2401
+ samples avg       0.96      0.96      0.96      2401
+
+120/120 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1910, 20), y_pred shape: (1910, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.98      0.99      1704
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       1.00      1.00      1.00        16
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       180
+     Klasa 8       0.00      0.00      0.00        10
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.89      0.89      0.89      1910
+   macro avg       0.10      0.10      0.10      1910
+weighted avg       0.90      0.89      0.89      1910
+ samples avg       0.89      0.89      0.89      1910
+
+131/131 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (2086, 20), y_pred shape: (2086, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.99      0.98      0.98       701
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.99      1.00      0.99      1385
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.99      0.99      0.99      2086
+   macro avg       0.10      0.10      0.10      2086
+weighted avg       0.99      0.99      0.99      2086
+ samples avg       0.99      0.99      0.99      2086
+
+184/184 [==============================] - 1s 3ms/step
+✅ y_test_patient shape: (2942, 20), y_pred shape: (2942, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.99      0.17      0.29      2348
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.67      0.82      0.73        22
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.03      0.36      0.06       215
+     Klasa 8       0.00      0.00      0.00       357
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.17      0.17      0.17      2942
+   macro avg       0.08      0.07      0.05      2942
+weighted avg       0.80      0.17      0.24      2942
+ samples avg       0.17      0.17      0.17      2942
+
+118/118 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1888, 20), y_pred shape: (1888, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         7
+     Klasa 1       1.00      0.97      0.98      1661
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       217
+     Klasa 8       0.00      0.00      0.00         1
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         1
+    Klasa 19       0.00      0.00      0.00         1
+
+   micro avg       0.86      0.85      0.86      1888
+   macro avg       0.05      0.05      0.05      1888
+weighted avg       0.88      0.85      0.87      1888
+ samples avg       0.85      0.85      0.85      1888
+
+187/187 [==============================] - 1s 3ms/step
+✅ y_test_patient shape: (2986, 20), y_pred shape: (2986, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.98      0.99      2880
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.50      1.00      0.67         2
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       104
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.95      0.95      0.95      2986
+   macro avg       0.07      0.10      0.08      2986
+weighted avg       0.96      0.95      0.96      2986
+ samples avg       0.95      0.95      0.95      2986
+
+114/114 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1824, 20), y_pred shape: (1824, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.32      0.49       205
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       158
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00      1305
+    Klasa 16       0.00      0.00      0.00       156
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.04      0.04      0.04      1824
+   macro avg       0.05      0.02      0.02      1824
+weighted avg       0.11      0.04      0.05      1824
+ samples avg       0.04      0.04      0.04      1824
+
+113/113 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1798, 20), y_pred shape: (1798, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.99      0.97      0.98      1599
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.57      0.57      0.57         7
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00        64
+     Klasa 8       0.00      0.00      0.00         1
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00       127
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.87      0.86      0.87      1798
+   macro avg       0.08      0.08      0.08      1798
+weighted avg       0.89      0.86      0.87      1798
+ samples avg       0.86      0.86      0.86      1798
+
+127/127 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (2022, 20), y_pred shape: (2022, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.99      1.00      1941
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.97      0.95      0.96        81
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.99      0.99      0.99      2022
+   macro avg       0.10      0.10      0.10      2022
+weighted avg       1.00      0.99      0.99      2022
+ samples avg       0.99      0.99      0.99      2022
+
+114/114 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (1818, 20), y_pred shape: (1818, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.95      0.97      1428
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       390
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.75      0.75      0.75      1818
+   macro avg       0.05      0.05      0.05      1818
+weighted avg       0.79      0.75      0.76      1818
+ samples avg       0.75      0.75      0.75      1818
+
+131/131 [==============================] - 1s 4ms/step
+✅ y_test_patient shape: (2082, 20), y_pred shape: (2082, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.78      0.88      1695
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.80      0.97      0.88       185
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       1.00      1.00      1.00         1
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00       201
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.75      0.73      0.74      2082
+   macro avg       0.14      0.14      0.14      2082
+weighted avg       0.88      0.73      0.79      2082
+ samples avg       0.73      0.73      0.73      2082
+
+145/145 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (2318, 20), y_pred shape: (2318, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.98      0.99      1753
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.95      0.96      0.95        72
+     Klasa 4       1.00      1.00      1.00         1
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.18      0.01      0.02       466
+     Klasa 8       0.00      0.00      0.00        14
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00        12
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.77      0.77      0.77      2318
+   macro avg       0.16      0.15      0.15      2318
+weighted avg       0.82      0.77      0.78      2318
+ samples avg       0.77      0.77      0.77      2318
+
+105/105 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (1679, 20), y_pred shape: (1679, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.85      0.92      1319
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       1.00      1.00      1.00         3
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00       345
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00        12
+
+   micro avg       0.68      0.67      0.68      1679
+   macro avg       0.10      0.09      0.10      1679
+weighted avg       0.79      0.67      0.72      1679
+ samples avg       0.67      0.67      0.67      1679
+
+141/141 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (2249, 20), y_pred shape: (2249, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.83      0.91      2247
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         1
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         1
+
+   micro avg       0.84      0.83      0.84      2249
+   macro avg       0.05      0.04      0.05      2249
+weighted avg       1.00      0.83      0.91      2249
+ samples avg       0.83      0.83      0.83      2249
+
+98/98 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (1566, 20), y_pred shape: (1566, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.99      0.44      0.61       312
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       1.00      1.00      1.00      1251
+     Klasa 3       0.25      1.00      0.40         1
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         2
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.89      0.89      0.89      1566
+   macro avg       0.11      0.12      0.10      1566
+weighted avg       1.00      0.89      0.92      1566
+ samples avg       0.89      0.89      0.89      1566
+
+99/99 [==============================] - 0s 4ms/step
+✅ y_test_patient shape: (1570, 20), y_pred shape: (1570, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       0.00      0.00      0.00         6
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.99      0.87      0.93       368
+     Klasa 3       0.97      1.00      0.98      1196
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         0
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       0.97      0.96      0.97      1570
+   macro avg       0.10      0.09      0.10      1570
+weighted avg       0.97      0.96      0.97      1570
+ samples avg       0.96      0.96      0.96      1570
+
+133/133 [==============================] - 0s 3ms/step
+✅ y_test_patient shape: (2128, 20), y_pred shape: (2128, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      0.87      0.93      1366
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.80      0.80      0.80         5
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       0.00      0.00      0.00         0
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.29      0.01      0.01       747
+     Klasa 8       0.00      0.00      0.00         9
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         1
+
+   micro avg       0.57      0.56      0.57      2128
+   macro avg       0.10      0.08      0.09      2128
+weighted avg       0.74      0.56      0.60      2128
+ samples avg       0.56      0.56      0.56      2128
+
+139/139 [==============================] - 1s 4ms/step
+✅ y_test_patient shape: (2222, 20), y_pred shape: (2222, 20)
+              precision    recall  f1-score   support
+
+     Klasa 0       1.00      1.00      1.00      2183
+     Klasa 1       0.00      0.00      0.00         0
+     Klasa 2       0.00      0.00      0.00         0
+     Klasa 3       0.00      0.00      0.00         0
+     Klasa 4       0.00      0.00      0.00         0
+     Klasa 5       1.00      1.00      1.00        36
+     Klasa 6       0.00      0.00      0.00         0
+     Klasa 7       0.00      0.00      0.00         3
+     Klasa 8       0.00      0.00      0.00         0
+     Klasa 9       0.00      0.00      0.00         0
+    Klasa 10       0.00      0.00      0.00         0
+    Klasa 11       0.00      0.00      0.00         0
+    Klasa 12       0.00      0.00      0.00         0
+    Klasa 13       0.00      0.00      0.00         0
+    Klasa 14       0.00      0.00      0.00         0
+    Klasa 15       0.00      0.00      0.00         0
+    Klasa 16       0.00      0.00      0.00         0
+    Klasa 17       0.00      0.00      0.00         0
+    Klasa 18       0.00      0.00      0.00         0
+    Klasa 19       0.00      0.00      0.00         0
+
+   micro avg       1.00      1.00      1.00      2222
+   macro avg       0.10      0.10      0.10      2222
+weighted avg       1.00      1.00      1.00      2222
+ samples avg       1.00      1.00      1.00      2222
+
