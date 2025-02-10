@@ -5,7 +5,7 @@ MIN_SAMPLES_FOR_MODEL=10
 MITDB_PATH="data/raw/mitdb/"
 ICENTIA11K_PATH="data/raw/mitdb/"
 SHAOXING_PATH="data/raw/mitdb/"
-TESTED_MODEL_PATH="models/trained_models/v2_no_interpolation/"
+TESTED_MODEL_PATH="models/trained_models/v4/"
 
 LABEL_MAP = {
     'N': 0,    # Normal beat (Normalny rytm zatokowy)

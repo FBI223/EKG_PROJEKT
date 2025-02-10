@@ -1,4 +1,3 @@
-import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -7,16 +6,18 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.python.client import device_lib
+from imblearn.over_sampling import RandomOverSampler
+from collections import Counter
+
 from data.dataset_loader import prepare_qrs_dataset
-from config import NUM_SAMPLES, MIN_SAMPLES_FOR_MODEL, TESTED_MODEL_PATH, MITDB_PATH
+from config import NUM_SAMPLES, TESTED_MODEL_PATH, MITDB_PATH
 from models.cnn_model import build_cnn
-from utils.preprocessing import filter_rare_classes
 from utils.testing import test_model_on_patient
 from tensorflow.keras.models import load_model
 
 def train_model():
     """Trenuje model CNN na EKG."""
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # ✅ Ukrycie ostrzeżeń TensorFlow
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
     print("✅ Urządzenie domyślne dla obliczeń:", tf.test.gpu_device_name())
     print(device_lib.list_local_devices())
@@ -26,52 +27,51 @@ def train_model():
     print("📥 Wczytywanie i segmentacja EKG...")
     X, Y = prepare_qrs_dataset(directory=MITDB_PATH)
 
-
-    # **2️⃣ Usuwanie rzadkich klas**
-    X, Y = filter_rare_classes(X, Y, min_samples=MIN_SAMPLES_FOR_MODEL)
-
-    # **🔍 Debug: Sprawdzenie unikalnych klas po filtracji**
+    # **2️⃣ Mapowanie klas PRZED oversamplingiem**
     unique_classes = np.unique(Y)
-    num_classes = len(unique_classes)
-    print(f"🎯 Unikalne klasy po filtracji: {unique_classes}, liczba klas: {num_classes}")
-
-    # ✅ Mapowanie klas na indeksy 0, 1, 2, ... N-1
     class_mapping = {c: i for i, c in enumerate(unique_classes)}
     print(f"📌 Mapa klas: {class_mapping}")
 
-    # Zamiana wartości Y na indeksy od 0 do num_classes-1
     Y = np.array([class_mapping[y] for y in Y])
 
-    # **3️⃣ Podział na zbiór treningowy i testowy**
-    print("🔄 Podział na zbiór treningowy i testowy...")
+    # **3️⃣ Oversampling (wyrównanie liczności klas)**
+    ros = RandomOverSampler(sampling_strategy='not majority', random_state=42)
+    X, Y = ros.fit_resample(X, Y)
+
+    # **4️⃣ Sprawdzenie liczby próbek po oversamplingu**
+    class_counts = Counter(Y)
+    print("📊 Liczba próbek po oversamplingu:", class_counts)
+
+    # **5️⃣ Podział na zbiór treningowy i testowy**
     X_train, X_test, y_train, y_test = train_test_split(
-        X, Y, test_size=0.2, random_state=42
+        X, Y, test_size=0.2, random_state=42, stratify=Y
     )
 
     print(f"📦 Zbiór treningowy: {X_train.shape[0]} próbek, Zbiór testowy: {X_test.shape[0]} próbek")
 
-    # **🎯 Zamiana etykiet na one-hot encoding**
+    # **6️⃣ Zamiana etykiet na one-hot encoding**
+    num_classes = len(class_mapping)
     y_train = to_categorical(y_train, num_classes=num_classes)
     y_test = to_categorical(y_test, num_classes=num_classes)
 
-    # **4️⃣ Formatowanie danych dla CNN**
-    X_train = np.expand_dims(X_train, axis=-1)  # (num_samples, 300, 1)
+    # **7️⃣ Formatowanie danych dla CNN**
+    X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
 
-    # **5️⃣ Definiowanie modelu CNN**
-    input_shape = (NUM_SAMPLES, 1)  # 300 próbek na segment, 1 kanał
+    # **8️⃣ Definiowanie modelu CNN**
+    input_shape = (NUM_SAMPLES, 1)
     model = build_cnn(input_shape, num_classes)
 
-    # **6️⃣ CALLBACKI**
-    early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True, verbose=1)
+    # **9️⃣ CALLBACKI**
+    early_stopping = EarlyStopping(monitor='val_loss', patience=2, restore_best_weights=True, verbose=1)
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6, verbose=1)
 
-    # **7️⃣ TRENING MODELU**
+    # **🔟 TRENING MODELU**
     print("🚀 Rozpoczęcie treningu...")
     history = model.fit(
-        X_train, y_train, epochs=30, batch_size=32,
+        X_train, y_train, epochs=6, batch_size=32,
         validation_data=(X_test, y_test),
-        callbacks=[early_stopping, reduce_lr]
+        callbacks=[reduce_lr, early_stopping]
     )
 
     # **💾 Zapisanie modelu**
@@ -102,9 +102,8 @@ def train_model():
 
 def test_model_on_mitdb():
     """Wczytuje zapisany model i testuje go na pacjentach."""
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # ✅ Wyłącza GPU dla TensorFlow w testowaniu
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-    # 📂 Ścieżka do modelu
     model_path_h5 = TESTED_MODEL_PATH + "cnn_ekg.h5"
     model_path_keras = TESTED_MODEL_PATH + "cnn_ekg.keras"
 
@@ -117,14 +116,13 @@ def test_model_on_mitdb():
     else:
         raise FileNotFoundError("❌ Nie znaleziono modelu!")
 
-    # 🔍 Pobranie listy wszystkich pacjentów w bazie
     dataset_dir = MITDB_PATH
     patients = [f.split('.')[0] for f in os.listdir(dataset_dir) if f.endswith('.dat')]
 
-    # **💉 Testowanie na wszystkich pacjentach**
     for patient in patients:
         test_model_on_patient(model, patient_record=patient)
 
+
 if __name__ == "__main__":
-    #train_model()  # 🚀 Trening modelu
+    #train_model()
     test_model_on_mitdb()
