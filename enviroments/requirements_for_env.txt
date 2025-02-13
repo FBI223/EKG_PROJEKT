@@ -31,7 +31,7 @@ conda install -c conda-forge imbalanced-learn
 
 3) GOOGLE COLAB
 
-!pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy biosppy wfdb
+!pip install tensorflow "numpy<2" pandas==2.2.2 wfdb scikit-learn matplotlib scipy biosppy wfdb seaborn imbalanced-learn
 !git clone https://FBI223:TOKEN_KEY@github.com/FBI223/EKG_PROJEKT.git
 %cd /content/EKG_PROJEKT
 !git pull origin master

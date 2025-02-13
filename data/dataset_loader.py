@@ -2,87 +2,89 @@ import numpy as np
 import os
 import wfdb
 from scipy.signal import resample
+from collections import Counter
 from data.process_data import save_processed_data
-from data.qrs_detection import detect_qrs_biosppy
-from utils.preprocessing import standarize_signal, add_medical_noise, select_highest_priority_class
-from config import LABEL_MAP, NUM_SAMPLES, MITDB_PATH
+from utils.preprocessing import standarize_signal
+from config import LABEL_MAP, NUM_SAMPLES, MITDB_PATH, SVDB_PATH
 
-def load_ecg_record(record_name, directory=MITDB_PATH):
-    """Wczytuje EKG i adnotacje z MIT-BIH."""
+
+def load_and_resample_ecg(record_name, directory, target_fs=360):
+    """🔍 Wczytuje EKG i adnotacje z SVDB, resampluje cały sygnał do `target_fs`, a następnie przesuwa adnotacje."""
     record_path = os.path.join(directory, record_name)
-    record = wfdb.rdrecord(record_path)
-    annotation = wfdb.rdann(record_path, 'atr')
 
-    return record.p_signal, annotation.sample, annotation.symbol, record.fs
+    try:
+        record = wfdb.rdrecord(record_path)
+        annotation = wfdb.rdann(record_path, 'atr')
+    except Exception as e:
+        print(f"❌ Błąd wczytywania pliku {record_name}: {e}")
+        return None, None, None, None
 
-def process_segment(segment, annotations, segment_start, segment_end):
-    """Przetwarza segment EKG, zapewniając dokładnie `NUM_SAMPLES` próbek za pomocą `resample`."""
-    original_length = len(segment)
+    original_fs = record.fs  # Oryginalna częstotliwość próbkowania (np. 128 Hz dla SVDB)
+    signal = record.p_signal[:, 0]  # Wybieramy pierwszy kanał EKG
 
-    # Odrzucanie segmentów, które są zbyt krótkie
-    if original_length < NUM_SAMPLES * 0.5:
-        return None, None
+    if original_fs != target_fs:
+        # Obliczamy nową liczbę próbek
+        new_length = int(len(signal) * (target_fs / original_fs))
+        signal = resample(signal, new_length)  # Resamplowanie całego sygnału
 
-        # Dodanie szumu i resampling
-    segment_noisy = add_medical_noise(segment)
-    segment_resampled = resample(segment_noisy, NUM_SAMPLES)
+        # Przesunięcie indeksów adnotacji
+        annotation.sample = (annotation.sample * (target_fs / original_fs)).astype(int)
 
-    # Skalowanie anotacji do nowego rozmiaru segmentu
-    scale_factor = NUM_SAMPLES / original_length
-    new_annotations = [
-        round((ann - segment_start) * scale_factor) for ann in annotations
-        if segment_start <= ann < segment_end
-    ]
-    new_annotations = np.clip(new_annotations, 0, NUM_SAMPLES - 1)
+    return signal, annotation.sample, annotation.symbol, target_fs
 
-    return segment_resampled, np.array(new_annotations, dtype=int)
 
-def segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks):
-    """Segmentuje EKG na podstawie wykrytych QRS-ów i przypisuje etykiety."""
+
+def segment_around_qrs(signal, qrs_peaks, labels, target_samples=300):
+    """🔍 Segmentuje EKG wokół QRS (środek = R-peak), przypisując klasę z QRS."""
     segments, segment_labels = [], []
+    median_rr = int(np.median(np.diff(qrs_peaks))) if len(qrs_peaks) > 1 else 300
 
-    for i in range(len(qrs_peaks) - 1):
-        start, end = qrs_peaks[i], qrs_peaks[i + 1]
+    for i, r in enumerate(qrs_peaks):
+        window_size = int(median_rr // 2)
+        start, end = int(max(0, r - window_size)), int(min(len(signal), r + window_size))
+
         segment = signal[start:end]
 
-        # Pobranie etykiet dla segmentu
-        segment_events = [
-            (ann, label) for ann, label in zip(annotations, labels)
-            if start <= ann < end and label in LABEL_MAP
-        ]
+        # 🔹 **Naprawa błędu** – wyrównanie długości segmentów
+        if len(segment) < target_samples:
+            segment = np.pad(segment, (0, target_samples - len(segment)), mode='constant')
+        elif len(segment) > target_samples:
+            segment = segment[:target_samples]
 
-        # Przetwarzanie segmentu (resampling i filtracja)
-        segment_resized, new_annotations = process_segment(
-            segment, [ann for ann, _ in segment_events], start, end
-        )
-
-        # Pomijanie segmentów, które nie spełniły warunków
-        if segment_resized is None or len(segment_events) == 0:
+        # Pobranie klasy
+        primary_label = labels[i] if i < len(labels) else None
+        if primary_label not in LABEL_MAP:
             continue
 
-        # Wybór klasy dla segmentu (priorytetyzacja)
-        segment_label = [LABEL_MAP[label] for _, label in segment_events]
-        primary_label = select_highest_priority_class(segment_label)
+        segments.append(segment)
+        segment_labels.append(LABEL_MAP[primary_label])
 
-        segments.append(segment_resized)
-        segment_labels.append(primary_label)
+    # 🔹 **Naprawa błędu** – konwersja do `np.array()` z jednolitą długością
+    return np.array(segments, dtype=np.float32), np.array(segment_labels, dtype=np.int32)
 
-    return np.array(segments), np.array(segment_labels)
 
-def prepare_qrs_dataset(directory=MITDB_PATH):
-    """Wczytuje pliki, segmentuje według QRS i przygotowuje zbiór do trenowania CNN."""
-    print("📥 Przetwarzanie danych od zera...")
 
+def prepare_qrs_dataset(directory, target_fs=360):
+    """🔍 Wczytuje pliki, resampluje SVDB do `target_fs`, segmentuje wokół QRS i zapisuje przetworzone dane."""
     all_segments, all_labels = [], []
     files = [f.split('.')[0] for f in os.listdir(directory) if f.endswith('.dat')]
 
-    for record_name in files:
-        signal, annotations, labels, fs = load_ecg_record(record_name, directory)
-        signal = standarize_signal(signal[:, 0])
-        qrs_peaks = detect_qrs_biosppy(signal, fs)
+    print(f"📂 Znaleziono {len(files)} plików EKG w katalogu {directory}")
 
-        # Segmentacja sygnału
-        X, y = segment_ecg_by_qrs(signal, annotations, labels, qrs_peaks)
+    for record_name in files:
+        signal, qrs_peaks, labels, fs = load_and_resample_ecg(record_name, directory, target_fs)
+        if signal is None:
+            continue
+
+        print(f"🔍 Przetwarzanie rekordu {record_name}, liczba QRS: {len(qrs_peaks)}")
+
+        signal = standarize_signal(signal)  # Standaryzacja sygnału
+
+        # Segmentacja wokół QRS
+        X, y = segment_around_qrs(signal, qrs_peaks, labels)
+
+        if len(X) == 0:
+            continue
 
         all_segments.extend(X)
         all_labels.extend(y)
@@ -91,13 +93,14 @@ def prepare_qrs_dataset(directory=MITDB_PATH):
     all_segments = np.array(all_segments)
     all_labels = np.array(all_labels)
 
-    # 🔥 Debugging: Weryfikacja liczby klas przed oversamplingiem
-    unique_labels, counts = np.unique(all_labels, return_counts=True)
-    print(f"🔍 Liczba próbek przed oversamplingiem: {len(all_segments)}")
-    print(f"🔍 Klasy przed oversamplingiem: {dict(zip(unique_labels, counts))}")
+    print(f"✅ Finalna liczba segmentów: {len(all_segments)}")
+    print(f"📊 Liczność klas przed zapisaniem: {Counter(all_labels)}")
 
-    # Zapisanie przetworzonych danych
+    if len(all_segments) == 0:
+        print("❌ Brak segmentów do zapisania! Sprawdź dane wejściowe.")
+        return None, None
+
+    # Zapisywanie przetworzonych danych
     save_processed_data(all_segments, all_labels, "ekg_segments")
 
-    print(f"✅ Zapisano dane: {len(all_segments)} próbek, {len(set(all_labels))} unikalnych klas")
     return all_segments, all_labels

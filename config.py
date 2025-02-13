@@ -6,8 +6,18 @@ MITDB_PATH="data/raw/mitdb/"
 ICENTIA11K_PATH="data/raw/mitdb/"
 SHAOXING_PATH="data/raw/mitdb/"
 TESTED_MODEL_PATH="models/trained_models/v4/"
+SVDB_PATH="data/raw/svdb/"
+
+
 
 LABEL_MAP = {
+    'N': 0, 'L': 1, 'R': 2, 'V': 3, 'A': 4, 'S': 5
+}
+
+
+
+
+LABEL_MAP2 = {
     'N': 0,    # Normal beat (Normalny rytm zatokowy)
     'L': 1,    # Left bundle branch block beat (LBBB) (Lewa odnoga bloku pęczka Hisa)
     'R': 2,    # Right bundle branch block beat (RBBB) (Prawa odnoga bloku pęczka Hisa)
